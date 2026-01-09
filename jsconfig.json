@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "checkJs": false,
+    "jsx": "react-jsx",
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ],
+      "components/*": [
+        "./src/components/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "src/vite-env.d.ts"
+  ]
+}

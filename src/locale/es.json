@@ -1,0 +1,101 @@
+{
+  "pages": {
+    "Auth": {
+      "user": "Usuario",
+      "password": {
+        "label": "Contraseña",
+        "placeholder": "Ingresa tu contraseña",
+        "validationRequired": "La contraseña es requerida",
+        "validationMatch": "Las contraseñas deben ser iguales"
+      },
+      "passwordConfirm": {
+        "label": "Confirma tu contraseña",
+        "placeholder": "Confirma tu contraseña"
+      },
+      "send": "Enviar",
+      "logout": "Cerrar sesión",
+      "login": "Iniciar sesión",
+      "register": "Registrarse",
+      "email": {
+        "label": "Email",
+        "placeholder": "Ingresa tu email",
+        "validationEmail": "Debe ser un email válido",
+        "validationRequired": "El email es requerido"
+      },
+      "buttons": {
+        "continue": "Continuar",
+        "continueLoading": "Cargando...",
+        "sendEmail": "Enviar email",
+        "backToLogin": "Volver al inicio de sesión"
+      }
+    }
+  },
+  "errors": {
+    "401": {
+      "title": "401: Autorización requerida",
+      "description": "¡Oops! Parece que te has topado con un muro de acceso. Asegúrate de estar autenticado correctamente para acceder a esta área.",
+      "goBackButton": "Volver al inicio de sesión"
+    },
+    "404": {
+      "title": "404: La página que estás buscando no existe.",
+      "description": "Has intentado acceder a una ruta incorrecta o viniste aquí por error. Sea lo que sea, intenta usar la navegación.",
+      "goBackButton": "Volver al Dashboard"
+    },
+    "500": {
+      "title": "500: Error en el Servidor",
+      "description": "¡Vaya! Nuestros servidores parecen estar pasando por un mal día. No te preocupes, estamos ocupados resolviendo este problema técnico.",
+      "goBackButton": "Volver al Dashboard"
+    }
+  },
+  "validations": {
+    "required": "Este campo es requerido.",
+    "string": "Este campo debe ser texto alfanumérico.",
+    "number": "Este campo debe ser un número.",
+    "stringOrNumber": "Este campo debe ser un texto o un número.",
+    "formatEmail": "Este campo debe ser un email válido.",
+    "passwordMatch": "Las contraseñas deben ser iguales",
+    "charExceded": "Este campo no puede exceder los {{maxChars}} caracteres.",
+    "file-invalid-type": "El tipo de archivo seleccionado no está permitido.",
+    "invalidDate": "Por favor, ingrese una fecha válida.",
+    "invalidHour": "Por favor, ingrese una hora válida."
+  },
+  "commons": {
+    "welcome": "Bienvenido",
+    "logout": "Cerrar sesión",
+    "select": "Seleccionar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "actions": "Acciones",
+    "noData": "No hay datos",
+    "noResults": "No hay resultados",
+    "noResultsFound": "No se encontraron resultados",
+    "noResultsFoundFor": "No se encontraron resultados para",
+    "noResultsFoundForSearch": "No se encontraron resultados para la búsqueda",
+    "successAdd": "Agregado exitosamente",
+    "successEdit": "Editado exitosamente",
+    "successDelete": "Eliminado exitosamente",
+    "retry": "Reintentar",
+    "noResultsFilter": "No hay resultados para el filtro aplicado",
+    "withFriends": "Con amigos",
+    "detail": "Detalle",
+    "ubication": "Ubicación",
+    "dates": "Fechas",
+    "desde": "Desde "
+
+  },
+  "dashboard": {
+    "artist": "Artista",
+    "location": "Locación",
+    "search": "Buscar",
+    "sales": "Ventas",
+    "waitingPeople": "Personas en espera",
+    "rentability": "Rentabilidad",
+    "souldOut": "Funciones sould out"
+  }
+  
+}
