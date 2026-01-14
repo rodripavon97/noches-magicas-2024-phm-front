@@ -18,42 +18,21 @@ import {
 import { Show } from '../../domain/Show'
 import UseUser from '../../hooks/useUser'
 import ModalComentario from '../Comentario/ModalComentario'
-import { showService } from '../../service/showService'
+import { DateFormatter } from '../../utils/dateFormatter'
+import { ScoreFormatter } from '../../utils/scoreFormatter'
+import { LoggingService } from '../../service/loggingService'
 
-const CardShow = ( { show, mostrarCantidadEntrada, estaEnPerfil }: CardShowProps ) => {
+const CardShow = ( { show, mostrarCantidadEntrada, estaEnPerfil, onComentarioPublicado }: CardShowProps ) => {
   const navigate = useNavigate()
   const { isLoggedIn } = UseUser()
-  const navigateToComprar = () => {
+  
+  const navigateToComprar = async () => {
     if (isLoggedIn) {
-      enviarLogs()
-      navigate(`/detalle-show/${show.id}`);
+      await LoggingService.registrarClickEnShow(show.id, show.ubicacion)
+      navigate(`/detalle-show/${show.id}`)
     } else {
-      navigate('/login');
+      navigate('/login')
     }
-
-  }
-  const enviarLogs = async () => {
-    const usuarioString = localStorage.getItem('user');
-    const usuario = JSON.parse(usuarioString);
-    const body ={
-      fecha: new Date().toISOString(),
-      nombreAlojamiento: show.ubicacion,
-      hora: new Date().toLocaleTimeString(),
-      usuario: usuario,
-    }
-    await showService.registrarLogClick(show.id,usuario.id,body)
-   
-
-  }
-  const formatDate = (date) => {
-    const parsedDate = new Date(date)
-    const day = parsedDate.getDate().toString().padStart(2, '0')
-    const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0')
-    return `${day}/${month}`
-  }
-
-  const formatPuntaje = (puntaje) => {
-    return puntaje.toFixed(2)
   }
 
 
@@ -111,7 +90,7 @@ const CardShow = ( { show, mostrarCantidadEntrada, estaEnPerfil }: CardShowProps
             </Text>
             <HStack spacing={1} fontSize="12px">
               <FaStar color={theme.colors.brand.colorFourth} />
-              <Text>{formatPuntaje(show.puntaje)}</Text>
+              <Text>{ScoreFormatter.formatScore(show.puntaje)}</Text>
               <Text>({show.comentariosTotales})</Text>
             </HStack>
           </Stack>
@@ -130,12 +109,12 @@ const CardShow = ( { show, mostrarCantidadEntrada, estaEnPerfil }: CardShowProps
               </Text>
             </HStack>
             <HStack spacing={1} fontSize="14px">
-              <Tooltip label={show.fecha.map(formatDate).join(', ')} placement="top-start">
+              <Tooltip label={show.fecha.map(DateFormatter.formatToShortDate).join(', ')} placement="top-start">
                 <Text>
                   Fechas:
                   {show.fecha.length === 1
-                    ? formatDate(show.fecha[0])
-                    : `${formatDate(show.fecha[0])} - ${formatDate(show.fecha[show.fecha.length - 1])}`}
+                    ? DateFormatter.formatToShortDate(show.fecha[0])
+                    : `${DateFormatter.formatToShortDate(show.fecha[0])} - ${DateFormatter.formatToShortDate(show.fecha[show.fecha.length - 1])}`}
                 </Text>
               </Tooltip>
             </HStack>
@@ -205,7 +184,7 @@ const CardShow = ( { show, mostrarCantidadEntrada, estaEnPerfil }: CardShowProps
                     show.estaAbierto ? (
                       <></>
                     ) : (
-                      <ModalComentario entrada={show} />
+                      <ModalComentario entrada={show} onComentarioPublicado={onComentarioPublicado} />
                     )
                   }
                 </>
@@ -216,6 +195,7 @@ const CardShow = ( { show, mostrarCantidadEntrada, estaEnPerfil }: CardShowProps
                   </Text>
                   
                     <Button size="sm" bg={theme.colors.brand.colorFourth}
+                      textColor={theme.colors.brand.text}
                       onClick={navigateToComprar}>
                       Comprar
                     </Button>
@@ -239,5 +219,6 @@ interface CardShowProps {
   show: Show
   mostrarCantidadEntrada: boolean
   estaEnPerfil: boolean
+  onComentarioPublicado?: () => void
 }
 

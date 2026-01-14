@@ -4,10 +4,10 @@ import '@fontsource/poppins/400.css'
 
 const colors = {
   brand: {
-    colorPrimary: '#2D3250',
-    colorSecundary: '#424769',
-    colorThrird: '#7077A1',
-    colorFourth: '#F58F29',
+    colorPrimary: '#030620',
+    colorSecundary: '#030637',
+    colorThrird: '#3C0753',
+    colorFourth: '#720455',
     soldOut: '#A6F098',
     semiSoldOut: '#F0E498',
     nullSoldOut: '#F09898',

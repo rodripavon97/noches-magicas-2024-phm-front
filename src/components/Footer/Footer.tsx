@@ -12,12 +12,10 @@ export const Footer = () => {
       justifyContent="center"
       alignItems="center"
       gap="1rem"
-      position="fixed"
-      bottom="0"
       w="100%"
-      zIndex="100"
       p="1rem"
-      h="6vh"
+      mt="auto"
+      minH="60px"
     >
       <FaFacebook />
       <Box>

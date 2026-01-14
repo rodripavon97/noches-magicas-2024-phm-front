@@ -106,6 +106,7 @@ export interface EntradaJSON {
   precioFinal: number;
   idFuncion: number;
   idShow: string;
+  cantidad?: number;
 }
 
 export interface CarritoJSON {
@@ -135,7 +136,8 @@ export interface UsuarioJSON {
   esAdm: boolean;
   edad: number;
   saldo: number;
-  DNI: number;
+  dni?: number;  // Minúsculas (como viene del backend ahora)
+  DNI?: number;  // Mayúsculas (compatibilidad con versiones anteriores)
   entradasCompradas: EntradaJSON[];
   amigosDelUsuario: number[];
 }

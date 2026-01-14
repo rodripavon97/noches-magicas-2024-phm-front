@@ -7,7 +7,8 @@ export class Entrada {
     public fecha: Date,
     public precioFinal: number,
     public idFuncion: number,
-    public idShow: string
+    public idShow: string,
+    public cantidad: number = 1
   ) {}
 
   static fromJSON(json: EntradaJSON): Entrada {
@@ -17,7 +18,8 @@ export class Entrada {
       new Date(json.fecha),
       json.precioFinal,
       json.idFuncion,
-      json.idShow
+      json.idShow,
+      json.cantidad || 1
     );
   }
 
@@ -28,7 +30,8 @@ export class Entrada {
       fecha: this.fecha.toISOString().split('T')[0],
       precioFinal: this.precioFinal,
       idFuncion: this.idFuncion,
-      idShow: this.idShow
+      idShow: this.idShow,
+      cantidad: this.cantidad
     };
   }
 

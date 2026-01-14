@@ -10,6 +10,7 @@ import DetalleShowCompra from '../Pages/DetalleShowCompra/DetalleShowCompra'
 import DetalleShowAdmin from '../Pages/DetalleAdminShow/DetalleShowAdmin'
 import ProtectedRoute from '../components/ProtectedRoute/ProtectedRoute'
 import PublicRoute from '../components/PublicRoute/PublicRoute'
+import Layout from '../components/Layout/Layout'
 
 
 const PublicRoutes = [
@@ -17,15 +18,27 @@ const PublicRoutes = [
 
   {
     path: '404',
-    element: <Errores status="404" />,
+    element: (
+      <Layout>
+        <Errores status="404" />
+      </Layout>
+    ),
   },
   {
     path: '401',
-    element: <Errores status="401" />,
+    element: (
+      <Layout>
+        <Errores status="401" />
+      </Layout>
+    ),
   },
   {
     path: '500',
-    element: <Errores status="500" />,
+    element: (
+      <Layout>
+        <Errores status="500" />
+      </Layout>
+    ),
   },
   {
     path: '*',
@@ -35,27 +48,33 @@ const PublicRoutes = [
   {
     path: '/dashboardAdm',
     element: (
-      <ProtectedRoute requireAdmin>
-        <DashboardAdm />
-      </ProtectedRoute>
+      <Layout>
+        <ProtectedRoute requireAdmin>
+          <DashboardAdm />
+        </ProtectedRoute>
+      </Layout>
     ),
   },
 
   {
     path: 'detalle-show/:id',
     element: (
-      <ProtectedRoute>
-        <DetalleShowCompra />
-      </ProtectedRoute>
+      <Layout>
+        <ProtectedRoute>
+          <DetalleShowCompra />
+        </ProtectedRoute>
+      </Layout>
     ),
   },
 
   {
     path: 'detalle-show/admin/:id',
     element: (
-      <ProtectedRoute requireAdmin>
-        <DetalleShowAdmin />
-      </ProtectedRoute>
+      <Layout>
+        <ProtectedRoute requireAdmin>
+          <DetalleShowAdmin />
+        </ProtectedRoute>
+      </Layout>
     ),
   },
 
@@ -63,7 +82,11 @@ const PublicRoutes = [
 
   {
     path: '/busqueda',
-    element: <BusquedaPage />,
+    element: (
+      <Layout>
+        <BusquedaPage />
+      </Layout>
+    ),
   },
 
   {
@@ -74,27 +97,33 @@ const PublicRoutes = [
   {
     path: '/login',
     element: (
-      <PublicRoute>
-        <LoginPage />
-      </PublicRoute>
+      <Layout showNavbar={false}>
+        <PublicRoute>
+          <LoginPage />
+        </PublicRoute>
+      </Layout>
     ),
   },
 
   {
     path: '/usuario',
     element: (
-      <ProtectedRoute>
-        <UsuarioPage />
-      </ProtectedRoute>
+      <Layout>
+        <ProtectedRoute>
+          <UsuarioPage />
+        </ProtectedRoute>
+      </Layout>
     ),
   },
 
   {
     path: '/carrito',
     element: (
-      <ProtectedRoute>
-        <CarritoPage />
-      </ProtectedRoute>
+      <Layout>
+        <ProtectedRoute>
+          <CarritoPage />
+        </ProtectedRoute>
+      </Layout>
     ),
   }
 ]

@@ -49,7 +49,7 @@ const BusquedaPage = () => {
       <FiltroBusqueda isAdmin={false} clickSearch={handleSearchClick} changeArtistaText={handleTextChangeArtista} changeLocacionText={handleTextChangeLocation} changeCheckboxAmigos={handleCheckAmigos}/>
      
         {show.length > 0 ? (
-           <SimpleGrid columns={3} placeItems="center" spacing={10} p={8} gap={5} mb="3rem">
+           <SimpleGrid columns={{sm: 1, md: 2, lg: 3}} placeItems="center" spacing={10} p={8} gap={5} mb="3rem">
             {show.map((shows) => (
               <CardShow show={shows} key={shows.id} mostrarCantidadEntrada={false} estaEnPerfil={false}/>
             ))}

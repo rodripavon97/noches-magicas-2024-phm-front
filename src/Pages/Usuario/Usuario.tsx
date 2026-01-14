@@ -18,7 +18,7 @@ const UsuarioPage = () => {
             const shows = await usuarioService.getEntradasCompradas()
             setEntradas(shows)
         } catch (error) {
-            console.log(error)
+            // Error al cargar entradas
         }
     }
 
@@ -27,7 +27,7 @@ const UsuarioPage = () => {
             const amigos = await usuarioService.getAmigos()
             setAmigos(amigos)
         } catch (error) {
-            console.log(error)
+            // Error al cargar amigos
         }
     }
 
@@ -36,15 +36,20 @@ const UsuarioPage = () => {
             const comentarios = await usuarioService.getComentarios()
             setComentarios(comentarios)
         } catch (error) {
-            console.log(error)
+            // Error al cargar comentarios
         }
     }
 
-    const cargarContenido = async (tabIndex) => {
-        switch (tabIndex) {
-            case 0: return await getEntradas()
-            case 1: return await getAmigos()
-            case 2: return await getComentarios()
+    const tabLoaders: Record<number, () => Promise<void>> = {
+        0: getEntradas,
+        1: getAmigos,
+        2: getComentarios
+    }
+
+    const cargarContenido = async (tabIndex: number) => {
+        const loader = tabLoaders[tabIndex]
+        if (loader) {
+            await loader()
         }
     }
 
@@ -52,7 +57,7 @@ const UsuarioPage = () => {
 
     return(
         <>
-            <Flex>
+            <Flex direction={{base: "column", sm: "row"}}>
                 <UsuarioSidebar/>
                 <Tabs w="70vw" onChange={(index) => cargarContenido(index)}>
                     <TabList>
@@ -60,15 +65,13 @@ const UsuarioPage = () => {
                         <Tab>Amigos</Tab>
                         <Tab>Comentarios</Tab>
                     </TabList>
-                    <TabPanels>
-                        <TabPanel> <UsuarioEntradas entradas={entradas}/> </TabPanel>
+                    <TabPanels flexDirection={{base: "column", sm: "row"}}>
+                        <TabPanel> <UsuarioEntradas entradas={entradas} onComentarioPublicado={getEntradas}/> </TabPanel>
                         <TabPanel> <UsuarioAmigosComponent amigos={amigos}/> </TabPanel>
                         <TabPanel> <UsuarioComentarios comentarios={comentarios}/> </TabPanel>
                     </TabPanels>
                 </Tabs>
-            </Flex>
-            <Flex mb={6}>
-            <Footer/>
+            
             </Flex>
         </>
     )

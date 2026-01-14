@@ -1,5 +1,6 @@
 import { UsuarioJSON } from "src/interface/interfaces";
 import { Entrada } from "./entrada";
+import { Validators } from "../utils/validators";
 
 export class Usuario {
   constructor(
@@ -22,30 +23,32 @@ export class Usuario {
       json.id,
       json.nombre,
       json.apellido,
-      new Date(json.fechaNacimiento),
+      Validators.ensureDate(json.fechaNacimiento),
       json.fotoPerfil,
       json.username,
       json.esAdm,
       json.edad,
       json.saldo,
-      json.DNI,
+      json.dni || json.DNI || 0, // El backend envía "dni" (minúsculas), no "DNI"
       json.entradasCompradas.map(e => Entrada.fromJSON(e)),
       json.amigosDelUsuario
     );
   }
 
   toJSON(): UsuarioJSON {
+    const fechaValida = Validators.ensureDate(this.fechaNacimiento)
     return {
       id: this.id,
       nombre: this.nombre,
       apellido: this.apellido,
-      fechaNacimiento: this.fechaNacimiento.toISOString().split('T')[0],
+      fechaNacimiento: fechaValida.toISOString().split('T')[0],
       fotoPerfil: this.fotoPerfil,
       username: this.username,
       esAdm: this.esAdm,
       edad: this.edad,
       saldo: this.saldo,
-      DNI: this.dni,
+      dni: this.dni,  // Usar minúsculas para coincidir con el backend
+      DNI: this.dni,  // Mantener mayúsculas para compatibilidad
       entradasCompradas: this.entradasCompradas.map(e => e.toJSON()),
       amigosDelUsuario: this.amigosDelUsuario
     };

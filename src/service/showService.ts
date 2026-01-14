@@ -46,14 +46,11 @@ class ShowService {
     }
 
     async agregarCarrito(idShow: string, idEntrada: number, cantidad: number, ubi: Ubicacion): Promise<any> {
-        console.log(ubi, "ubi")
         const id = localStorage.getItem('userId')
-
         const carritoJSON = await axios.post(
             `${REST_SERVER_URL}/agregar-carrito/${id}/${idShow}/${idEntrada}/${cantidad}/${ubi}`
         )
         return carritoJSON.data
-
     }
 
     async getShowPorID(id: string): Promise<ShowDetalle> {
@@ -62,28 +59,18 @@ class ShowService {
     }
 
     async agregarNuevaFuncion(showId: string, nuevaFuncion: NuevaFuncionData): Promise<any> {
-        try {
-            const payload = {
-                fecha: nuevaFuncion.fecha,
-                hora: nuevaFuncion.hora + ':00',
-                estado: "PrecioBase"
-            }
-            const response = await axios.post(`${REST_SERVER_URL}/show/${showId}/nueva-funcion`, payload)
-            return response.data
-        } catch (error) {
-            console.error('Error al agregar nueva función:', error)
-            throw error
+        const payload = {
+            fecha: nuevaFuncion.fecha,
+            hora: nuevaFuncion.hora + ':00',
+            estado: "PrecioBase"
         }
+        const response = await axios.post(`${REST_SERVER_URL}/show/${showId}/nueva-funcion`, payload)
+        return response.data
     }
     
     async eliminarShow(id: string): Promise<any> {
-        try {
-            const response = await axios.delete(`${REST_SERVER_URL}/show/${id}`)
-            return response.data
-        } catch (error) {
-            console.error('Error al eliminar el show:', error)
-            throw error
-        }
+        const response = await axios.delete(`${REST_SERVER_URL}/show/${id}`)
+        return response.data
     }
 
     async sumarAListaEspera(showId: string): Promise<void> {
@@ -93,27 +80,17 @@ class ShowService {
 
 
     async editarShow(id: string, newData: EditarShowData): Promise<any> {
-        try {
-            const payload = {
-                nombreBanda: newData.nombreBanda,
-                nombreRecital: newData.nombreShow,
-            }
-            const response = await axios.patch(`${REST_SERVER_URL}/show/${id}`, payload)
-            return response.data
-        } catch (error) {
-            console.error('Error al editar el show:', error)
-            throw error
+        const payload = {
+            nombreBanda: newData.nombreBanda,
+            nombreRecital: newData.nombreShow,
         }
+        const response = await axios.patch(`${REST_SERVER_URL}/show/${id}`, payload)
+        return response.data
     }
 
     async registrarLogClick(idShow: string, idUsuario: string, payload: any): Promise<any> {
-        try {
-            const response = await axios.post(`${REST_SERVER_URL}/show/${idShow}/log/${idUsuario}`, payload)
-            return response.data
-        } catch (error) {
-            console.error('Error al registrar el log de clic:', error)
-            throw error
-        }
+        const response = await axios.post(`${REST_SERVER_URL}/show/${idShow}/log/${idUsuario}`, payload)
+        return response.data
     }
 }
 

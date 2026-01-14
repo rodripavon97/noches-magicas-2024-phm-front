@@ -19,6 +19,7 @@ import PropTypes from 'prop-types'
 import moment from 'moment'
 import 'moment/locale/es'
 import { useMessageToast } from '../../hooks/useToast'
+import { ScoreFormatter } from '../../utils/scoreFormatter'
 
 
 moment.updateLocale('es', {
@@ -33,9 +34,7 @@ export interface DetalleShowProps {
 export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
 
   const { t } = useTranslation('detalleShow')
-  const [cantidad0, setCantidad0] = useState(0)
-  const [cantidad1, setCantidad1] = useState(0)
-  const [cantidad2, setCantidad2] = useState(0)
+  const [cantidades, setCantidades] = useState<number[]>([0, 0, 0])
   const [isOpen, setIsOpen] = useState(false)
   const { id } = useParams()
   const [input1, setInput1] = useState('')
@@ -51,7 +50,7 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
       const ShowByID = await showService.getShowPorID(id)
       setShow(ShowByID)
     } catch (error) {
-      console.log(error)
+      // Error al cargar show
     }
   }
 
@@ -68,32 +67,28 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
     }
 
     const ubicaciones = Array.from(showDetalle.ubicacionCosto.keys())
+    const totalEntradas = cantidades.reduce((sum, cant) => sum + cant, 0)
+    
+    if (totalEntradas === 0) {
+      errorToast('Por favor selecciona al menos una entrada')
+      return
+    }
+    
     try {
-      if (cantidad0 > 0 && ubicaciones[0]) {
-        await agregarAlCarrito(showDetalle.id, funcion, cantidad0, ubicaciones[0])
-      }
-      if (cantidad1 > 0 && ubicaciones[1]) {
-        await agregarAlCarrito(showDetalle.id, funcion, cantidad1, ubicaciones[1])
-      }
-      if (cantidad2 > 0 && ubicaciones[2]) {
-        await agregarAlCarrito(showDetalle.id, funcion, cantidad2, ubicaciones[2])
-      }
-      
-      if (cantidad0 === 0 && cantidad1 === 0 && cantidad2 === 0) {
-        errorToast('Por favor selecciona al menos una entrada')
-        return
+      for (let i = 0; i < cantidades.length; i++) {
+        if (cantidades[i] > 0 && ubicaciones[i]) {
+          await agregarAlCarrito(showDetalle.id, funcion, cantidades[i], ubicaciones[i])
+        }
       }
       
       successToast('Se ha agregado al carrito')
       navigate('/carrito')
     } catch (error) {
-      console.error('Error al agregar al carrito:', error)
       errorToast(error?.response?.data?.message || 'Error al agregar al carrito')
     }
   }
 
   const agregarAlCarrito = async (idShow: string, funcion: number, cantidad: number, ubicacion: string) => {
-    console.log('agregar al carrito', idShow, funcion, cantidad, ubicacion)
     // Asegurarse de que ubicacion sea un string válido del enum
     const ubicacionString = ubicacion.toString()
     await usuarioService.agregarAlCarrito(idShow, funcion, cantidad, ubicacionString as any)
@@ -105,16 +100,14 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
     getShowPorID()
   }
 
-  const handleNumberInputChange = (value, ubicacionCosto) => {
+  const handleNumberInputChange = (value: number, ubicacionCosto: number) => {
     const precios = Array.from(showDetalle.ubicacionCosto.values())
     const index = precios.findIndex((i) => i == ubicacionCosto)
-    switch (index) {
-      case 0:
-        return setCantidad0(value)
-      case 1:
-        return setCantidad1(value)
-      case 2:
-        return setCantidad2(value)
+    
+    if (index !== -1 && index < cantidades.length) {
+      const nuevasCantidades = [...cantidades]
+      nuevasCantidades[index] = value
+      setCantidades(nuevasCantidades)
     }
   }
 
@@ -124,16 +117,8 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
     setFuncion(index)
   }
 
-  const formatoTitulo = (ubicacion) => {
+  const formatoTitulo = (ubicacion: string) => {
     return ubicacion.replace(/([A-Z])/g, ' $1').trim()
-  }
-
-  const formatPuntaje = (puntaje) => {
-    if (typeof puntaje === 'number') {
-      return puntaje.toFixed(2)
-    } else {
-      return 'Puntaje no disponible'
-    }
   }
 
   useOnInit(getShowPorID)
@@ -155,7 +140,7 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
             <Flex fontSize="1.3rem" justifyContent={'space-between'} w={'100%'}>
 
               <Flex fontWeight="bold" flexDirection={'row'} alignItems={'center'} gap={'0.5rem'}>
-                <FaStar /> {formatPuntaje(showDetalle.puntaje)} - {showDetalle.cantidadComentario} opiniones
+                <FaStar /> {ScoreFormatter.formatScore(showDetalle.puntaje)} - {showDetalle.cantidadComentario} opiniones
               </Flex>
               <Flex fontWeight="200" alignItems={'center'} gap={'0.5rem'}>
                 <FaLocationDot /> {showDetalle.ubicacion}

@@ -4,12 +4,13 @@ import { Show } from 'src/domain/Show'
 
 export interface Entradas {
   entradas: Show[]
+  onComentarioPublicado?: () => void
 }
 
-export const UsuarioEntradas = ({ entradas }: Entradas) => {
+export const UsuarioEntradas = ({ entradas, onComentarioPublicado }: Entradas) => {
   return (
     <Grid templateColumns="repeat(2, 1fr)" gap="1rem" placeItems="center">
-      {entradas.map((show) => (<CardShow show={show} key={show.id} mostrarCantidadEntrada={false} estaEnPerfil={true}/>))}
+      {entradas.map((show) => (<CardShow show={show} key={show.id} mostrarCantidadEntrada={false} estaEnPerfil={true} onComentarioPublicado={onComentarioPublicado}/>))}
     </Grid>
   )
 }

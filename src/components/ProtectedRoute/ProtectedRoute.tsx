@@ -4,7 +4,7 @@ import UseUser from '../../hooks/useUser.jsx'
 
 export interface ProtectedRouteProps {
   children: React.ReactNode,
-  requireAdmin: boolean
+  requireAdmin?: boolean
 }
 const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
   const { isLoggedIn, isAdmin } = UseUser()

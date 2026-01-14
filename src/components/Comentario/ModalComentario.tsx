@@ -10,7 +10,7 @@ import { useMessageToast } from '../../hooks/useToast'
 import { Show } from 'src/domain/Show'
 
 
-const ModalComentario = ({ entrada }: ModalComentarioProps) => {
+const ModalComentario = ({ entrada, onComentarioPublicado }: ModalComentarioProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [contenido, setContenido] = useState("")
     const [puntuacion, setPuntuacion] = useState(0)
@@ -20,18 +20,21 @@ const ModalComentario = ({ entrada }: ModalComentarioProps) => {
         try {
             await usuarioService.dejarComentario(entrada.idShow, entrada.id, contenido, puntuacion)
             successToast("Comentario publicado")
+            onClose()
+            setContenido("")
+            setPuntuacion(0)
+            // Notificar al componente padre que se publicó un comentario
+            if (onComentarioPublicado) {
+                onComentarioPublicado()
+            }
         } catch (error) {
-            console.error('Error al dejar comentario:', error)
             errorToast(error)
         }
-        onClose()
-        setContenido("")
-        setPuntuacion(0)
     }
 
     return(
         <>
-            <Button size="sm" bg={theme.colors.brand.colorFourth}
+            <Button size="sm" bg={theme.colors.brand.colorFourth} textColor={theme.colors.brand.text}
                 onClick={onOpen}>
                 Dejar Comentario
             </Button>
@@ -74,4 +77,5 @@ export default ModalComentario
 
 export interface ModalComentarioProps {
     entrada: Show
+    onComentarioPublicado?: () => void
 }

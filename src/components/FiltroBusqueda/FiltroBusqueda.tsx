@@ -28,17 +28,18 @@ const FiltroBusqueda = ({isAdmin, clickSearch, changeArtistaText, changeLocacion
 
   return (
     <Flex
-      direction="row"
+      direction={{ base: "column", lg: "row" }}
       justifyContent="center"
       alignItems="center"
-      p="1rem 12rem 0 12rem"
+      gap={{ base: 4, lg: 2 }}
+      p={{ base: "1rem", md: "1rem 4rem", lg: "1rem 12rem 0 12rem" }}
+      w="100%"
     >
       <InputGroup
-        p="0 0 0 1rem"
         display="flex"
         justifyContent="center"
         alignItems="center"
-        mx="auto"
+        maxW={{ base: "100%", lg: "auto" }}
         _placeholder={{ color: 'brand.colorSecundary' }}
       >
         <Input
@@ -48,6 +49,7 @@ const FiltroBusqueda = ({isAdmin, clickSearch, changeArtistaText, changeLocacion
           placeholder="Artista"
           borderColor={theme.colors.brand.colorSecundary}
           onChange={changeArtistaText}
+          textColor={theme.colors.brand.text}
           
         />
         <InputRightAddon
@@ -58,11 +60,10 @@ const FiltroBusqueda = ({isAdmin, clickSearch, changeArtistaText, changeLocacion
         </InputRightAddon>
       </InputGroup>
       <InputGroup
-        p="0 0 0 1rem"
         display="flex"
         justifyContent="center"
         alignItems="center"
-        mx="auto"
+        maxW={{ base: "100%", lg: "auto" }}
         _placeholder={{ color: 'brand.colorSecondary' }}
       >
         <Input
@@ -72,6 +73,7 @@ const FiltroBusqueda = ({isAdmin, clickSearch, changeArtistaText, changeLocacion
           placeholder="Locacion"
           borderColor={theme.colors.brand.colorSecundary}
           onChange={changeLocacionText}
+          textColor={theme.colors.brand.text}
         />
         <InputRightAddon
           bg="brand.colorFourth"
@@ -80,23 +82,32 @@ const FiltroBusqueda = ({isAdmin, clickSearch, changeArtistaText, changeLocacion
           <FaCity />
         </InputRightAddon>
       </InputGroup>
-      <HStack spacing={2} alignItems="center">
+      <Flex 
+        direction={{ base: "column", lg: "row" }} 
+        gap={{ base: 3, lg: 2 }}
+        alignItems="center"
+        w={{ base: "100%", lg: "auto" }}
+      >
         {!isAdmin &&
           <Checkbox
           color="white"
           iconColor="brand.colorFourth"
-          flex="0 0 130px"
-          paddingLeft="0.5rem"
+          w={{ base: "100%", lg: "auto" }}
           onChange={changeCheckboxAmigos}
         >
           {t('withFriends')}
         </Checkbox>
         }
         
-        <Button bg="brand.colorSecundary" color="brand.colorFourth" w="130px" ml={2} onClick={clickSearch}>
-        {t('search')}
+        <Button 
+          bg="brand.colorSecundary" 
+          color="brand.colorFourth" 
+          w={{ base: "100%", lg: "130px" }}
+          onClick={clickSearch}
+        >
+          {t('search')}
         </Button>
-      </HStack>
+      </Flex>
     </Flex>
   )
 }

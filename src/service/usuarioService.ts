@@ -100,15 +100,8 @@ class UsuarioService {
       ubicacion: ubi
     }
     
-    console.log('Agregando al carrito:', { userId: id, requestBody })
-    
-    try {
-      const response = await axios.post(`${REST_SERVER_URL}/agregar-carrito/${id}`, requestBody)
-      return response
-    } catch (error: any) {
-      console.error('Error en agregarAlCarrito:', error.response?.data || error.message)
-      throw error
-    }
+    const response = await axios.post(`${REST_SERVER_URL}/agregar-carrito/${id}`, requestBody)
+    return response
   }
 
   async sumarCredito(credito: number): Promise<AxiosResponse> {

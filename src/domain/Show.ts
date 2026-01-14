@@ -20,13 +20,41 @@ export class Show {
     public estaAbierto: boolean = false
   ) {}
 
-  static fromJSON(json: ShowJSON ): Show {
-    return Object.assign(new Show(), json)
+  static fromJSON(json: ShowJSON): Show {
+    return new Show(
+      json.id,
+      json.imagen,
+      json.nombreBanda,
+      json.nombreRecital,
+      json.ubicacion,
+      json.fecha.map(f => new Date(f)),
+      json.hora,
+      json.precioLocacionBarata,
+      json.precioLocacionCara,
+      json.amigosQueVanAlShow.map(a => UsuarioAmigos.fromJSON(a)),
+      json.puntaje,
+      json.comentariosTotales,
+      json.precioEntrada,
+      json.estaAbierto
+    );
   }
 
   toJSON(): ShowJSON {
     return {
-      ...this.toJSON()
+      id: this.id,
+      imagen: this.imagen,
+      nombreBanda: this.nombreBanda,
+      nombreRecital: this.nombreRecital,
+      ubicacion: this.ubicacion,
+      fecha: this.fecha.map(f => f.toISOString().split('T')[0]),
+      hora: this.hora,
+      precioLocacionBarata: this.precioLocacionBarata,
+      precioLocacionCara: this.precioLocacionCara,
+      amigosQueVanAlShow: this.amigosQueVanAlShow.map(a => a.toJSON()),
+      puntaje: this.puntaje,
+      comentariosTotales: this.comentariosTotales,
+      precioEntrada: this.precioEntrada,
+      estaAbierto: this.estaAbierto
     };
   }
 
