@@ -60,7 +60,7 @@ const CarritoPage = () => {
                 total + (show.precioEntrada * (show.sizeCarrito || 1)), 0)
             setTotalPrice(totalPrice)
         } catch (error) {
-            // Error al cargar carrito
+            errorToast(error)
         }
     }
 
@@ -91,26 +91,58 @@ const CarritoPage = () => {
 
     return (
         <>
-            <Container maxW='100vm' h='84vh' p='0' display='flex' flexDirection='column' justifyContent='space-between' mb="18vh">
-                <SimpleGrid columns={3} placeItems='center' spacing={10} p={8} gap={5} mb='3rem'>
+            <Container maxW='100vm' minH='84vh' p='0' display='flex' flexDirection='column' mb="18vh">
+                <SimpleGrid columns={{base: 1, lg: 3}} placeItems='center' spacing={10} p={8} gap={5} mb='3rem' flex="1">
                     {showsAgrupados.map((show, index) => (
                         <CarritoItemCardAgrupada show={show} key={`${show.idShow}-${index}`} />
                     ))}
                 </SimpleGrid>
-                <Card bg={theme.colors.brand.colorSecundary} alignItems='end' color={theme.styles.global} fontWeight='bold' fontSize='20px' p='5px'>
-                    Total: ${totalPrice}
-                    <HStack mb='10px'>
-                        <Button onClick={comprarEntradas} color={theme.styles.global} bg={theme.colors.brand.colorThrird}>
-                            Continuar Pago
-                        </Button>
-                        {
-                            shows.length > 0 && (
-                                <Button onClick={vaciarCarrito} color={theme.styles.global} bg={theme.colors.brand.colorFourth}>
-                                    Vaciar
-                                </Button>
-                            )
-                        }
-                    </HStack>
+                <Card 
+                    bg={theme.colors.brand.colorSecundary} 
+                    color={theme.styles.global} 
+                    fontWeight='bold' 
+                    fontSize={{base: '16px', md: '20px'}} 
+                    p={{base: '15px', md: '5px'}}
+                    position={{base: 'fixed', md: 'static'}}
+                    bottom={{base: '60px', md: 'auto'}}
+                    left="0"
+                    right="0"
+                    zIndex="10"
+                    borderRadius={{base: '0', md: 'md'}}
+                >
+                    <Flex 
+                        direction={{base: 'column', md: 'row'}} 
+                        alignItems={{base: 'stretch', md: 'end'}} 
+                        justifyContent="space-between"
+                        gap={{base: 2, md: 0}}
+                        width="100%"
+                    >
+                        <Text mb={{base: 2, md: 0}}>Total: ${totalPrice}</Text>
+                        <HStack spacing={2} justifyContent={{base: 'center', md: 'flex-end'}}>
+                            <Button 
+                                onClick={comprarEntradas} 
+                                color={theme.styles.global} 
+                                bg={theme.colors.brand.colorThrird}
+                                size={{base: 'sm', md: 'md'}}
+                                flex={{base: 1, md: 'initial'}}
+                            >
+                                Continuar Pago
+                            </Button>
+                            {
+                                shows.length > 0 && (
+                                    <Button 
+                                        onClick={vaciarCarrito} 
+                                        color={theme.styles.global} 
+                                        bg={theme.colors.brand.colorFourth}
+                                        size={{base: 'sm', md: 'md'}}
+                                        flex={{base: 1, md: 'initial'}}
+                                    >
+                                        Vaciar
+                                    </Button>
+                                )
+                            }
+                        </HStack>
+                    </Flex>
                 </Card>
             </Container>
         </>
