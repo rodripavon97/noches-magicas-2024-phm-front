@@ -48,7 +48,7 @@ export const UsuarioSidebar = () => {
             value.esAdm,
             value.edad,
             value.saldo,
-            value.dni, // Ya viene correctamente mapeado del fromJSON
+            value.dni,
             value.entradasCompradas || [],
             value.amigosDelUsuario || []
         )
@@ -72,14 +72,11 @@ export const UsuarioSidebar = () => {
             await usuarioService.editarDatos(usuario.nombre, usuario.apellido)
             successToast("Datos editados con éxito")
             
-            // Obtener datos actualizados del servidor
             const datosActualizados = await usuarioService.getInfoUsuario()
             const usuarioActualizado = Usuario.fromJSON(datosActualizados)
             
-            // Actualizar el estado local
             setUsuario(usuarioActualizado)
             
-            // Convertir a objeto plano usando Object.assign (más simple)
             const usuarioPlano = Object.assign({}, {
                 id: usuarioActualizado.id,
                 nombre: usuarioActualizado.nombre,
@@ -95,7 +92,6 @@ export const UsuarioSidebar = () => {
                 dni: usuarioActualizado.dni,
             })
             
-            // Actualizar el estado global de Zustand con objeto plano
             setUser(usuarioPlano)
         } catch (error) {
             errorToast(error)
@@ -133,13 +129,13 @@ export const UsuarioSidebar = () => {
     }
 
     return (
-        <Flex direction={{sm: "column", lg: "column"}} align="center" justify="space-evenly" w="30vw" padding="1rem" paddingBottom="3rem" gap="1rem" maxHeight="100vh">
+        <Flex direction="column" align="center" justify={{base: "center", lg: "space-evenly"}} w={{base: "100%", lg: "30vw"}} padding="1rem" paddingBottom="3rem" gap="1rem" maxHeight="100vh">
             <Avatar size="xl" name={usuario.username} src={usuario.fotoPerfil}/>
             
-            <Flex direction="column" align="start" width="25vw">
+            <Flex direction="column" align={{"sm": "center", "lg": "start"}} width={{base: "100%", lg: "25vw"}} px={{base: "1rem", lg: "0"}}>
                 <Text fontWeight="bold" mb={1}>Nombres</Text>
                 <Input 
-                    w="25vw" 
+                    w="100%" 
                     onChange={cambiarNombre} 
                     value={usuario.nombre || ''} 
                     placeholder="Nombre"
@@ -148,7 +144,7 @@ export const UsuarioSidebar = () => {
                 
                 <Text fontWeight="bold" mb={1}>Apellidos</Text>
                 <Input 
-                    w="25vw" 
+                    w="100%" 
                     onChange={cambiarApellido} 
                     value={usuario.apellido || ''} 
                     placeholder="Apellido"
@@ -157,7 +153,7 @@ export const UsuarioSidebar = () => {
                 
                 <Text fontWeight="bold" mb={1}>Fecha de Nacimiento</Text>
                 <Input 
-                    w="25vw" 
+                    w="100%" 
                     type="date" 
                     disabled={true} 
                     value={usuario.fechaNacimiento instanceof Date ? usuario.fechaNacimiento.toISOString().split('T')[0] : usuario.fechaNacimiento}
@@ -167,15 +163,22 @@ export const UsuarioSidebar = () => {
             <Box fontSize="1.5rem">
                 <b>Edad:</b> {usuario.edad || 0} años
             </Box>
+
+            <Flex justify="center" width={{base: "100%", lg: "25vw"}} px={{base: "1rem", lg: "0"}}>
+                <Button 
+                    bgColor={theme.colors.brand.colorFourth} 
+                    onClick={enviarCambios} 
+                    width="100%" 
+                    textColor={theme.colors.brand.text}
+                >
+                    Guardar Cambios
+                </Button>
+            </Flex>
             
-            <Button bgColor={theme.colors.brand.colorFourth} onClick={enviarCambios} width="25vw" textColor={theme.colors.brand.text}>
-                Guardar Cambios
-            </Button>
-            
-            <Flex direction="column" align="start" width="25vw">
+            <Flex direction="column" align="start" width={{base: "100%", lg: "25vw"}} px={{base: "1rem", lg: "0"}}>
                 <Text fontWeight="bold" mb={1}>DNI</Text>
                 <Input 
-                    w="25vw" 
+                    w="100%" 
                     type="text" 
                     disabled={true} 
                     value={usuario.dni || ''} 
@@ -188,9 +191,16 @@ export const UsuarioSidebar = () => {
                 <b>Crédito:</b> ${usuario.saldo || 0}
             </Box>
             
-            <Button bgColor={theme.colors.brand.colorFourth} onClick={onOpen} width="25vw" textColor={theme.colors.brand.text}>
-                Sumar Crédito
-            </Button>
+            <Flex justify="center" width={{base: "100%", lg: "25vw"}} px={{base: "1rem", lg: "0"}}>
+                <Button 
+                    bgColor={theme.colors.brand.colorFourth} 
+                    onClick={onOpen} 
+                    width="100%" 
+                    textColor={theme.colors.brand.text}
+                >
+                    Sumar Crédito
+                </Button>
+            </Flex>
 
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />

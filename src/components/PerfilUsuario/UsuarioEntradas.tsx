@@ -9,7 +9,7 @@ export interface Entradas {
 
 export const UsuarioEntradas = ({ entradas, onComentarioPublicado }: Entradas) => {
   return (
-    <Grid templateColumns="repeat(2, 1fr)" gap="1rem" placeItems="center">
+    <Grid templateColumns={{sm: "repeat(1, 1fr)", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)"}} gap="1rem" placeItems="center">
       {entradas.map((show) => (<CardShow show={show} key={show.id} mostrarCantidadEntrada={false} estaEnPerfil={true} onComentarioPublicado={onComentarioPublicado}/>))}
     </Grid>
   )
