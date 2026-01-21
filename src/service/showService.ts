@@ -33,7 +33,20 @@ class ShowService {
             `${REST_SERVER_URL}/shows?artista=${artista || ''}&locacion=${location || ''}&id=${id || ''}&conAmigos=${conAmigos || ''}`
         )
         const show = showJSON$.data.map((showJSON) =>
-            Show.fromJSON(showJSON),
+            Show.fromJSON({
+                ...showJSON,
+                fecha: showJSON.fecha || [],
+                hora: showJSON.hora || [],
+                amigosQueVanAlShow: showJSON.amigosQueVanAlShow || [],
+                precioEntrada: showJSON.precioEntrada ?? 0,
+                estaAbierto: showJSON.estaAbierto ?? false,
+                // Campos de admin (no vienen en endpoint normal, usar defaults)
+                ventas: showJSON.ventas ?? 0,
+                rentabilidad: showJSON.rentabilidad ?? 0,
+                personasEnEspera: showJSON.personasEnEspera ?? 0,
+                souldOut: showJSON.souldOut ?? 0,
+                puedeAgregarFuncion: showJSON.puedeAgregarFuncion ?? true,
+            }),
         )
         return show
     }
@@ -42,7 +55,22 @@ class ShowService {
         const id = localStorage.getItem('userId')
         const showsJSON$ = await axios.get<ShowJSON[]>(
             `${REST_SERVER_URL}/admin/shows?artista=${artista || ''}&locacion=${location || ''}&id=${id || ''}`)
-        return showsJSON$.data.map((showDataAdmin) => Show.fromJSON(showDataAdmin))
+        
+        // Asegurar que los campos opcionales existan antes de mapear
+        return showsJSON$.data.map((showDataAdmin) => Show.fromJSON({
+            ...showDataAdmin,
+            fecha: showDataAdmin.fecha || [],
+            hora: showDataAdmin.hora || [],
+            amigosQueVanAlShow: showDataAdmin.amigosQueVanAlShow || [],
+            precioEntrada: showDataAdmin.precioEntrada ?? 0,
+            estaAbierto: showDataAdmin.estaAbierto ?? false,
+            // Campos de admin con valores por defecto
+            ventas: showDataAdmin.ventas ?? 0,
+            rentabilidad: showDataAdmin.rentabilidad ?? 0,
+            personasEnEspera: showDataAdmin.personasEnEspera ?? 0,
+            souldOut: showDataAdmin.souldOut ?? 0,
+            puedeAgregarFuncion: showDataAdmin.puedeAgregarFuncion ?? true,
+        }))
     }
 
     async agregarCarrito(idShow: string, idEntrada: number, cantidad: number, ubi: Ubicacion): Promise<any> {

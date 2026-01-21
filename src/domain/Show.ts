@@ -17,7 +17,13 @@ export class Show {
     public puntaje: number | null = null,
     public comentariosTotales: number = 0,
     public precioEntrada: number = 0,
-    public estaAbierto: boolean = false
+    public estaAbierto: boolean = false,
+    // Campos solo para admin
+    public ventas: number = 0,
+    public rentabilidad: number = 0,
+    public personasEnEspera: number = 0,
+    public souldOut: number = 0,
+    public puedeAgregarFuncion: boolean = true
   ) {}
 
   static fromJSON(json: ShowJSON): Show {
@@ -27,15 +33,21 @@ export class Show {
       json.nombreBanda,
       json.nombreRecital,
       json.ubicacion,
-      json.fecha.map(f => new Date(f)),
-      json.hora,
+      json.fecha?.map(f => new Date(f)) || [],
+      json.hora || [],
       json.precioLocacionBarata,
       json.precioLocacionCara,
-      json.amigosQueVanAlShow.map(a => UsuarioAmigos.fromJSON(a)),
+      json.amigosQueVanAlShow?.map(a => UsuarioAmigos.fromJSON(a)) || [],
       json.puntaje,
       json.comentariosTotales,
-      json.precioEntrada,
-      json.estaAbierto
+      json.precioEntrada ?? 0,
+      json.estaAbierto ?? false,
+      // Campos de admin
+      json.ventas ?? 0,
+      json.rentabilidad ?? 0,
+      json.personasEnEspera ?? 0,
+      json.souldOut ?? 0,
+      json.puedeAgregarFuncion ?? true
     );
   }
 
@@ -46,11 +58,11 @@ export class Show {
       nombreBanda: this.nombreBanda,
       nombreRecital: this.nombreRecital,
       ubicacion: this.ubicacion,
-      fecha: this.fecha.map(f => f.toISOString().split('T')[0]),
+      fecha: this.fecha?.map(f => f.toISOString().split('T')[0]),
       hora: this.hora,
       precioLocacionBarata: this.precioLocacionBarata,
       precioLocacionCara: this.precioLocacionCara,
-      amigosQueVanAlShow: this.amigosQueVanAlShow.map(a => a.toJSON()),
+      amigosQueVanAlShow: this.amigosQueVanAlShow?.map(a => a.toJSON()),
       puntaje: this.puntaje,
       comentariosTotales: this.comentariosTotales,
       precioEntrada: this.precioEntrada,
