@@ -15,15 +15,21 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+    /* Path aliases */
     "baseUrl": ".",
     "paths": {
-      "src/*": ["./src/*"],
-      "components/*": ["./src/components/*"]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@types/*": ["./src/types/*"],
+      "@service/*": ["./src/service/*"],
+      "@domain/*": ["./src/domain/*"]
     }
   },
   "include": ["src"],

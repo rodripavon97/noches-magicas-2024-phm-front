@@ -40,3 +40,6 @@ export type {
 } from './services';
 
 export { QueryKeys } from './services';
+
+// Hooks
+export type { ApiError as HooksApiError, UseApiResult } from './hooks';

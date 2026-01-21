@@ -4,8 +4,8 @@ import { theme } from '../../styles/styles'
 import { useState, useEffect } from "react"
 import { usuarioService } from "../../service/usuarioService"
 import { Usuario } from "../../domain/Usuario"
-import { useMessageToast } from "src/hooks/useToast"
-import UseUser from "src/hooks/useUser"
+import { useMessageToast } from "@hooks/useToast"
+import UseUser from "@hooks/useUser"
 
 export const UsuarioSidebar = () => {
     const [usuario, setUsuario] = useState(null)

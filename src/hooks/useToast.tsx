@@ -1,11 +1,23 @@
 import { useToast } from '@chakra-ui/react'
+
 const INTERNAL_SERVER_ERROR = 500
+
+interface ErrorResponse {
+  response?: {
+    status: number
+    data?: {
+      message: string
+    }
+  }
+  message?: string
+}
+
 export const useMessageToast = () => {
   const toast = useToast()
 
-  const errorToast = (error) => {
+  const errorToast = (error: ErrorResponse | any): void => {
     const response = error.response ? error.response : 'Error de dominio'
-    const status = error.response ? response.status : '400'
+    const status = error.response ? response.status : 400
     const message = response.data ? response.data.message : error.message
 
     const mensajeError =
@@ -27,7 +39,7 @@ export const useMessageToast = () => {
     })
   }
 
-  const successToast = (mensajeExitoso) => {
+  const successToast = (mensajeExitoso: string): void => {
     toast({
       description: mensajeExitoso,
       status: 'success',

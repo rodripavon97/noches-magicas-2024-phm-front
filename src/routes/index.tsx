@@ -3,7 +3,7 @@ import DashboardAdm from '../Pages/Dashboard/AdminPage'
 // @ts-ignore
 import Errores from '../Pages/Errores'
 import BusquedaPage from '../Pages/Busqueda/Busqueda'
-import LoginPage from "../Pages/Login/Login.js"
+import LoginPage from "../Pages/Login/Login"
 import UsuarioPage from '../Pages/Usuario/Usuario'
 import CarritoPage from "../Pages/Carrito/Carrito"
 import DetalleShowCompra from '../Pages/DetalleShowCompra/DetalleShowCompra'

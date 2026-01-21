@@ -1,7 +1,7 @@
 import {Button, Card, HStack} from "@chakra-ui/react"
-import{ theme } from "../../styles/styles.js"
+import { theme } from "../../styles/styles"
 import PropTypes from "prop-types"
-import { Usuario } from "../../domain/Usuario.js"
+import { Usuario } from "../../domain/Usuario"
 
 export interface CardCarritoProps {
     usuario: Usuario

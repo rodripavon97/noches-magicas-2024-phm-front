@@ -3,7 +3,7 @@ import { theme } from '../../styles/styles'
 import { Center, Text, Input, Button, VStack, Container } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { usuarioService } from '../../service/usuarioService'
-import UseUser from "../../hooks/useUser.jsx"
+import UseUser from "../../hooks/useUser"
 import { useMessageToast } from '../../hooks/useToast'
 
 const CardLoginShow = () => {

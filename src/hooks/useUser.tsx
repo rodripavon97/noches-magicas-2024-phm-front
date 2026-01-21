@@ -1,9 +1,36 @@
 import { create } from "zustand"
 
-const UseUser = create((set) => {
+interface UserData {
+  id: number
+  nombre: string
+  apellido: string
+  fechaNacimiento: string | Date
+  fotoPerfil: string
+  username: string
+  esAdm: boolean
+  edad: number
+  saldo: number
+  dni?: number
+  DNI?: number
+  _updated?: number
+}
+
+interface UserStore {
+  isLoggedIn: boolean
+  isAdmin: boolean
+  userId: string | null
+  user: Partial<UserData>
+  cart: any[]
+  login: () => void
+  logout: () => void
+  setUser: (userData: UserData) => void
+}
+
+const UseUser = create<UserStore>((set) => {
   const userId = localStorage.getItem("userId")
   const isAdmin = localStorage.getItem("isAdmin") === "true"
-  const user = JSON.parse(localStorage.getItem("user")) || {}
+  const user = JSON.parse(localStorage.getItem("user") || '{}')
+  
   return {
     isLoggedIn: !!userId,
     isAdmin,
@@ -22,9 +49,10 @@ const UseUser = create((set) => {
       localStorage.removeItem("isAdmin")
       localStorage.removeItem("userFotoPerfil")
       localStorage.removeItem("nombreApellido")
+      localStorage.removeItem("user")
       set({ isLoggedIn: false, isAdmin: false, userId: null, user: {} })
     },
-    setUser: (userData) => {
+    setUser: (userData: UserData) => {
       try {
         // Crear una copia limpia del objeto para evitar problemas de referencia
         // Solo guardamos datos básicos que se pueden serializar sin problemas
@@ -58,6 +86,7 @@ const UseUser = create((set) => {
         })
       } catch (error) {
         // Error silencioso para evitar logs innecesarios
+        console.error('Error al guardar usuario:', error)
       }
     },
   }
