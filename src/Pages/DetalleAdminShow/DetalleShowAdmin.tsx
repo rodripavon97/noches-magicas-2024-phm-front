@@ -1,4 +1,4 @@
-import DetalleShow from "src/components/DetalleShow/detalleShowPage"
+import DetalleShow from "@components/DetalleShow/detalleShowPage"
 
 
 const DetalleShowAdmin = () => {

@@ -1,1 +1,40 @@
-node_modules
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Builds
+dist/
+dist-ssr/
+*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing
+coverage/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Lock files de otros package managers (mantener pnpm-lock.yaml)
+package-lock.json
+yarn.lock
+
+# IMPORTANTE: NO agregar package.json aquí

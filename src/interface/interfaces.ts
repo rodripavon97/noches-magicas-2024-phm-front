@@ -48,15 +48,21 @@ export interface ShowJSON {
   nombreBanda: string;
   nombreRecital: string;
   ubicacion: string;
-  fecha: string[]; // LocalDate[] como string[]
-  hora: string[]; // LocalTime[] como string[]
+  fecha?: string[]; // LocalDate[] como string[]
+  hora?: string[]; // LocalTime[] como string[]
   precioLocacionBarata: number;
   precioLocacionCara: number;
-  amigosQueVanAlShow: UsuarioAmigosJSON[];
+  amigosQueVanAlShow?: UsuarioAmigosJSON[]; // Opcional (no viene en admin)
   puntaje: number | null;
   comentariosTotales: number;
-  precioEntrada: number;
-  estaAbierto: boolean;
+  precioEntrada?: number; // Opcional
+  estaAbierto?: boolean; // Opcional
+  // Campos solo para admin (opcionales)
+  ventas?: number;
+  rentabilidad?: number;
+  personasEnEspera?: number;
+  souldOut?: number;
+  puedeAgregarFuncion?: boolean;
 }
 
 export interface ShowAdminJSON {

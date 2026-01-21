@@ -4,7 +4,7 @@ import { theme } from '../../styles/styles'
 import { IoPerson } from 'react-icons/io5'
 import { FaShoppingBasket, FaHome, FaUser } from 'react-icons/fa'
 import { MdDashboard } from 'react-icons/md'
-import UseUser from '../../hooks/useUser.jsx'
+import UseUser from '../../hooks/useUser'
 import { useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
