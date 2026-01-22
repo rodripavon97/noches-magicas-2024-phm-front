@@ -5,7 +5,7 @@ Button, Textarea, Slider, SliderTrack, SliderFilledTrack, SliderThumb, SliderMar
 import { theme } from '../../styles/styles'
 import { useState } from 'react'
 import { FaStar } from 'react-icons/fa'
-import { usuarioService } from "../../service/usuarioService"
+import { useUserComments, UseUser } from "../../hooks"
 import { useMessageToast } from '../../hooks/useToast'
 import { Show } from 'src/domain/Show'
 
@@ -14,11 +14,24 @@ const ModalComentario = ({ entrada, onComentarioPublicado }: ModalComentarioProp
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [contenido, setContenido] = useState("")
     const [puntuacion, setPuntuacion] = useState(0)
+    const [loading, setLoading] = useState(false)
+    
+    const { userId } = UseUser()
+    const { addComment } = useUserComments(userId || 0)
     const { errorToast, successToast } = useMessageToast()
 
     const enviarComentario = async () => {
+        if (!contenido.trim()) {
+            errorToast({ message: 'El comentario no puede estar vacío' })
+            return
+        }
+
+        setLoading(true)
         try {
-            await usuarioService.dejarComentario(entrada.idShow, entrada.id, contenido, puntuacion)
+            await addComment(entrada.idShow, {
+                contenido,
+                puntuacion: puntuacion > 0 ? puntuacion : null,
+            })
             successToast("Comentario publicado")
             onClose()
             setContenido("")
@@ -29,6 +42,8 @@ const ModalComentario = ({ entrada, onComentarioPublicado }: ModalComentarioProp
             }
         } catch (error) {
             errorToast(error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -64,8 +79,23 @@ const ModalComentario = ({ entrada, onComentarioPublicado }: ModalComentarioProp
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button mr="3" bgColor={theme.colors.brand.colorFourth} onClick={enviarComentario}>Publicar comentario</Button>
-                        <Button color={theme.colors.brand.colorFourth} variant='ghost' onClick={onClose}>Cancelar</Button>
+                        <Button 
+                            mr="3" 
+                            bgColor={theme.colors.brand.colorFourth} 
+                            onClick={enviarComentario}
+                            isLoading={loading}
+                            loadingText="Publicando..."
+                        >
+                            Publicar comentario
+                        </Button>
+                        <Button 
+                            color={theme.colors.brand.colorFourth} 
+                            variant='ghost' 
+                            onClick={onClose}
+                            isDisabled={loading}
+                        >
+                            Cancelar
+                        </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

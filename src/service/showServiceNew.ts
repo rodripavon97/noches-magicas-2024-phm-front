@@ -1,14 +1,11 @@
 /**
- * Servicio de shows refactorizado siguiendo principios SOLID:
- * - SRP: Responsabilidad única (gestión de shows)
- * - DIP: Depende de abstracciones (IHttpClient, IShowService)
+ * Servicio de gestión de shows
  */
 
-import { IHttpClient } from '../abstractions/IHttpClient';
-import { IShowService } from '../../types/services';
-import { ShowJSON, Ubicacion } from '../../interface/interfaces';
-import { Show } from '../../domain/Show';
-import { ShowDetalle } from '../../domain/detalleShow';
+import axios from 'axios';
+import { REST_SERVER_URL } from './constant';
+import { ShowJSON } from '../interface/interfaces';
+import { ShowDetalle } from '../domain/detalleShow';
 
 export interface GetShowsParams {
   artista?: string;
@@ -33,9 +30,7 @@ export interface EditarShowData {
   nombreShow: string;
 }
 
-export class ShowService implements IShowService {
-  constructor(private httpClient: IHttpClient) {}
-
+class ShowServiceNew {
   // ============================================
   // MÉTODOS DE CONSULTA
   // ============================================
@@ -49,17 +44,18 @@ export class ShowService implements IShowService {
       conAmigos: String(conAmigos),
     });
 
-    return this.httpClient.get<ShowJSON[]>(`/shows?${queryParams}`);
+    const response = await axios.get<ShowJSON[]>(`${REST_SERVER_URL}/shows?${queryParams}`);
+    return response.data;
   }
 
   async getShowById(id: string): Promise<ShowJSON> {
-    const showDetalle = await this.httpClient.get<any>(`/show-detalle/${id}`);
-    return showDetalle;
+    const response = await axios.get<any>(`${REST_SERVER_URL}/show-detalle/${id}`);
+    return response.data;
   }
 
   async getShowDetail(id: string): Promise<ShowDetalle> {
-    const showJSON = await this.httpClient.get<any>(`/show-detalle/${id}`);
-    return ShowDetalle.fromJSON(showJSON);
+    const response = await axios.get<any>(`${REST_SERVER_URL}/show-detalle/${id}`);
+    return ShowDetalle.fromJSON(response.data);
   }
 
   async searchShows(query: string): Promise<ShowJSON[]> {
@@ -82,7 +78,8 @@ export class ShowService implements IShowService {
       id: String(userId || ''),
     });
 
-    const shows = await this.httpClient.get<ShowJSON[]>(`/admin/shows?${queryParams}`);
+    const response = await axios.get<ShowJSON[]>(`${REST_SERVER_URL}/admin/shows?${queryParams}`);
+    const shows = response.data;
     
     // Asegurar que los campos opcionales existan para evitar errores
     return shows.map(show => ({
@@ -102,7 +99,8 @@ export class ShowService implements IShowService {
   }
 
   async createShow(showData: Partial<ShowJSON>): Promise<ShowJSON> {
-    return this.httpClient.post<ShowJSON>('/admin/shows', showData);
+    const response = await axios.post<ShowJSON>(`${REST_SERVER_URL}/admin/shows`, showData);
+    return response.data;
   }
 
   async updateShow(id: string, updates: EditarShowData): Promise<void> {
@@ -110,11 +108,11 @@ export class ShowService implements IShowService {
       nombreBanda: updates.nombreBanda,
       nombreRecital: updates.nombreShow,
     };
-    await this.httpClient.patch(`/show/${id}`, payload);
+    await axios.patch(`${REST_SERVER_URL}/show/${id}`, payload);
   }
 
   async deleteShow(id: string): Promise<void> {
-    await this.httpClient.delete(`/show/${id}`);
+    await axios.delete(`${REST_SERVER_URL}/show/${id}`);
   }
 
   // ============================================
@@ -127,7 +125,7 @@ export class ShowService implements IShowService {
       hora: functionData.hora + ':00',
       estado: 'PrecioBase',
     };
-    await this.httpClient.post(`/show/${showId}/nueva-funcion`, payload);
+    await axios.post(`${REST_SERVER_URL}/show/${showId}/nueva-funcion`, payload);
   }
 
   // ============================================
@@ -135,7 +133,7 @@ export class ShowService implements IShowService {
   // ============================================
 
   async addToWaitingList(showId: string, userId: number): Promise<void> {
-    await this.httpClient.post(`/show/${showId}/fila-espera/${userId}`);
+    await axios.post(`${REST_SERVER_URL}/show/${showId}/fila-espera/${userId}`);
   }
 
   // ============================================
@@ -143,6 +141,8 @@ export class ShowService implements IShowService {
   // ============================================
 
   async registerClickLog(showId: string, userId: string, payload: any): Promise<void> {
-    await this.httpClient.post(`/show/${showId}/log/${userId}`, payload);
+    await axios.post(`${REST_SERVER_URL}/show/${showId}/log/${userId}`, payload);
   }
 }
+
+export const showServiceNew = new ShowServiceNew();

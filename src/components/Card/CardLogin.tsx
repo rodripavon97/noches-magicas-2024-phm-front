@@ -2,27 +2,23 @@ import { useState } from 'react'
 import { theme } from '../../styles/styles'
 import { Center, Text, Input, Button, VStack, Container } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
-import { usuarioService } from '../../service/usuarioService'
-import UseUser from "../../hooks/useUser"
+import { useLogin } from '../../hooks'
 import { useMessageToast } from '../../hooks/useToast'
 
 const CardLoginShow = () => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const navigate = useNavigate()
-    const { login, setUser } = UseUser()
+    const { login, loading } = useLogin()
     const { errorToast, successToast } = useMessageToast()
 
     const intentoLogin = async() => {
         try {
-            const usuario = await usuarioService.login(username, password)
+            const usuario = await login({ username, password })
             if (usuario) {
-                login()
-                setUser(usuario)
                 successToast("Login Exitoso")
                 navigate(usuario.esAdm ? "/dashboardAdm" : "/busqueda")
             }
-
         } catch (error) {
             errorToast(error)
         }
@@ -44,7 +40,16 @@ const CardLoginShow = () => {
                     <Input type="text" placeholder="Usuario" onChange={e => setUsername(e.target.value)} />
                     <Text>Contraseña</Text>
                     <Input type='password' placeholder="Contraseña" onChange={e => setPassword(e.target.value)} />
-                    <Button w='15%' alignSelf="center" mt="5" p="5" bg={theme.colors.brand.colorFourth} onClick={intentoLogin}>
+                    <Button 
+                        w='15%' 
+                        alignSelf="center" 
+                        mt="5" 
+                        p="5" 
+                        bg={theme.colors.brand.colorFourth} 
+                        onClick={intentoLogin}
+                        isLoading={loading}
+                        loadingText="Ingresando..."
+                    >
                         Ingresar
                     </Button>
                 </VStack>

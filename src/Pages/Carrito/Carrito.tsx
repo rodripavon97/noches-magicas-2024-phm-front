@@ -1,7 +1,6 @@
-import { Button, Card, Container, HStack, SimpleGrid, Badge, Image, Stack, Text, Flex } from '@chakra-ui/react'
-import { useState } from 'react'
-import { usuarioService } from '../../service/usuarioService'
-import { useOnInit } from '@hooks/useOnInit'
+import { Button, Card, Container, HStack, SimpleGrid, Badge, Image, Stack, Text, Flex, Spinner } from '@chakra-ui/react'
+import { useState, useEffect } from 'react'
+import { useCart, UseUser } from '../../hooks'
 import { useMessageToast } from '@hooks/useToast'
 import { theme } from '../../styles/styles'
 import { useNavigate } from 'react-router-dom'
@@ -11,10 +10,12 @@ import { DateFormatter } from '../../utils/dateFormatter'
 import { ScoreFormatter } from '../../utils/scoreFormatter'
 
 const CarritoPage = () => {
-    const [shows, setShows] = useState([])
+    const { userId } = UseUser()
+    const { cart, loading, clearCart, checkout, refetch } = useCart(userId || 0)
     const [showsAgrupados, setShowsAgrupados] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
     const { errorToast, successToast } = useMessageToast()
+    const navigate = useNavigate()
 
     const agruparShowsPorId = (showsData: Carrito[]) => {
         const grupos: Map<string, Carrito[]> = new Map()
@@ -46,40 +47,42 @@ const CarritoPage = () => {
         })
     }
 
-    const getCarrito = async () => {
-        try {
-            const showsData = await usuarioService.getCarrito()
-            setShows(showsData)
-            
+    // Actualizar datos cuando cambie el carrito
+    useEffect(() => {
+        if (cart && cart.length > 0) {
             // Agrupar shows por ID
-            const agrupados = agruparShowsPorId(showsData)
+            const agrupados = agruparShowsPorId(cart)
             setShowsAgrupados(agrupados)
             
             // Calcular el precio total considerando la cantidad de entradas por item
-            const totalPrice = showsData.reduce((total, show) => 
+            const totalPrice = cart.reduce((total, show) => 
                 total + (show.precioEntrada * (show.sizeCarrito || 1)), 0)
             setTotalPrice(totalPrice)
-        } catch (error) {
-            errorToast(error)
+        } else {
+            setShowsAgrupados([])
+            setTotalPrice(0)
         }
-    }
+    }, [cart])
 
-    const vaciarCarrito = async () => {
+    // Cargar carrito al montar
+    useEffect(() => {
+        if (userId) {
+            refetch()
+        }
+    }, [userId, refetch])
+
+    const handleVaciarCarrito = async () => {
         try {
-            await usuarioService.vaciarCarrito()
-            await getCarrito()
+            await clearCart()
             successToast('Carrito vaciado correctamente.')
         } catch (error) {
             errorToast(error)
         }
     }
 
-    const navigate = useNavigate()
-
-    const comprarEntradas = async () => {
+    const handleComprarEntradas = async () => {
         try {
-            await usuarioService.comprarEntradas()
-            await getCarrito()
+            await checkout()
             successToast('Compra realizada exitosamente.')
             navigate('/usuario')
         } catch (error){
@@ -87,15 +90,27 @@ const CarritoPage = () => {
         }
     }
 
-    useOnInit(getCarrito)
+    if (loading) {
+        return (
+            <Container maxW='100vm' minH='84vh' display='flex' justifyContent='center' alignItems='center'>
+                <Spinner size='xl' color={theme.colors.brand.colorFourth} />
+            </Container>
+        )
+    }
 
     return (
         <>
             <Container maxW='100vm' minH='84vh' p='0' display='flex' flexDirection='column' mb="18vh">
                 <SimpleGrid columns={{base: 1, lg: 3}} placeItems='center' spacing={10} p={8} gap={5} mb='3rem' flex="1">
-                    {showsAgrupados.map((show, index) => (
-                        <CarritoItemCardAgrupada show={show} key={`${show.idShow}-${index}`} />
-                    ))}
+                    {showsAgrupados.length > 0 ? (
+                        showsAgrupados.map((show, index) => (
+                            <CarritoItemCardAgrupada show={show} key={`${show.idShow}-${index}`} />
+                        ))
+                    ) : (
+                        <Text color="white" fontSize="lg" gridColumn="1 / -1">
+                            No hay productos en el carrito
+                        </Text>
+                    )}
                 </SimpleGrid>
                 <Card 
                     bg={theme.colors.brand.colorSecundary} 
@@ -120,22 +135,25 @@ const CarritoPage = () => {
                         <Text mb={{base: 2, md: 0}}>Total: ${totalPrice}</Text>
                         <HStack spacing={2} justifyContent={{base: 'center', md: 'flex-end'}}>
                             <Button 
-                                onClick={comprarEntradas} 
+                                onClick={handleComprarEntradas} 
                                 color={theme.styles.global} 
                                 bg={theme.colors.brand.colorThrird}
                                 size={{base: 'sm', md: 'md'}}
                                 flex={{base: 1, md: 'initial'}}
+                                isDisabled={cart.length === 0 || loading}
+                                isLoading={loading}
                             >
                                 Continuar Pago
                             </Button>
                             {
-                                shows.length > 0 && (
+                                cart.length > 0 && (
                                     <Button 
-                                        onClick={vaciarCarrito} 
+                                        onClick={handleVaciarCarrito} 
                                         color={theme.styles.global} 
                                         bg={theme.colors.brand.colorFourth}
                                         size={{base: 'sm', md: 'md'}}
                                         flex={{base: 1, md: 'initial'}}
+                                        isLoading={loading}
                                     >
                                         Vaciar
                                     </Button>

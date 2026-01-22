@@ -1,59 +1,54 @@
 import Footer from '../../components/Footer/Footer'
 import { UsuarioSidebar } from '../../components/PerfilUsuario/UsuarioSidebar'
-import { Tabs, TabList, TabPanels, Tab, TabPanel, Flex, Box, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from '@chakra-ui/react'
+import { Tabs, TabList, TabPanels, Tab, TabPanel, Flex, Box, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Spinner } from '@chakra-ui/react'
 import { UsuarioEntradas } from '../../components/PerfilUsuario/UsuarioEntradas'
 import { UsuarioAmigosComponent } from '../../components/PerfilUsuario/UsuarioAmigos'
 import { UsuarioComentarios } from '../../components/PerfilUsuario/UsuarioComentarios'
-import { useState } from "react"
-import { useOnInit } from "../../hooks/useOnInit"
-import { usuarioService } from "../../service/usuarioService"
+import { useEffect } from "react"
+import { usePurchasedTickets, useUserFriends, useUserComments, UseUser } from "../../hooks"
+import { useMessageToast } from "../../hooks/useToast"
+import { Show } from "../../domain/Show"
+import { Usuario } from "../../domain/Usuario"
+import { Comentario } from "../../domain/Comentario"
 
 const UsuarioPage = () => {
-    const [entradas, setEntradas] = useState([])
-    const [amigos, setAmigos] = useState([])
-    const [comentarios, setComentarios] = useState([])
+    const { userId } = UseUser()
+    const { errorToast } = useMessageToast()
 
-    const getEntradas = async () => {
-        try {
-            const shows = await usuarioService.getEntradasCompradas()
-            setEntradas(shows)
-        } catch (error) {
-            // Error al cargar entradas
-        }
-    }
+    // Hooks de servicios
+    const { tickets, loading: loadingEntradas, error: errorEntradas, refetch: refetchEntradas } = usePurchasedTickets(userId || 0)
+    const { friends, loading: loadingAmigos, error: errorAmigos, refetch: refetchAmigos } = useUserFriends(userId || 0)
+    const { comments, loading: loadingComentarios, error: errorComentarios, refetch: refetchComentarios } = useUserComments(userId || 0)
 
-    const getAmigos = async () => {
-        try {
-            const amigos = await usuarioService.getAmigos()
-            setAmigos(amigos)
-        } catch (error) {
-            // Error al cargar amigos
-        }
-    }
+    // Mostrar errores con toast
+    useEffect(() => {
+        if (errorEntradas) errorToast(errorEntradas)
+        if (errorAmigos) errorToast(errorAmigos)
+        if (errorComentarios) errorToast(errorComentarios)
+    }, [errorEntradas, errorAmigos, errorComentarios, errorToast])
 
-    const getComentarios = async () => {
-        try {
-            const comentarios = await usuarioService.getComentarios()
-            setComentarios(comentarios)
-        } catch (error) {
-            // Error al cargar comentarios
-        }
-    }
-
-    const tabLoaders: Record<number, () => Promise<void>> = {
-        0: getEntradas,
-        1: getAmigos,
-        2: getComentarios
-    }
+    // Convertir tickets a Shows
+    const entradas = tickets.map(ticket => Show.fromJSON(ticket))
+    const amigos = friends.map(friend => Usuario.fromJSON(friend))
+    const comentarios = comments.map(comment => Comentario.fromJSON(comment))
 
     const cargarContenido = async (tabIndex: number) => {
-        const loader = tabLoaders[tabIndex]
+        const loaders = {
+            0: refetchEntradas,
+            1: refetchAmigos,
+            2: refetchComentarios
+        }
+        const loader = loaders[tabIndex]
         if (loader) {
             await loader()
         }
     }
 
-    useOnInit(getEntradas)
+    useEffect(() => {
+        if (userId) {
+            refetchEntradas()
+        }
+    }, [userId, refetchEntradas])
 
     return(
         <>
@@ -71,7 +66,7 @@ const UsuarioPage = () => {
                                 <AccordionIcon />
                             </AccordionButton>
                             <AccordionPanel pb={4}>
-                                <UsuarioEntradas entradas={entradas} onComentarioPublicado={getEntradas}/>
+                                {loadingEntradas ? <Spinner /> : <UsuarioEntradas entradas={entradas} onComentarioPublicado={refetchEntradas}/>}
                             </AccordionPanel>
                         </AccordionItem>
 
@@ -83,7 +78,7 @@ const UsuarioPage = () => {
                                 <AccordionIcon />
                             </AccordionButton>
                             <AccordionPanel pb={4}>
-                                <UsuarioAmigosComponent amigos={amigos}/>
+                                {loadingAmigos ? <Spinner /> : <UsuarioAmigosComponent amigos={amigos}/>}
                             </AccordionPanel>
                         </AccordionItem>
 
@@ -95,7 +90,7 @@ const UsuarioPage = () => {
                                 <AccordionIcon />
                             </AccordionButton>
                             <AccordionPanel pb={4}>
-                                <UsuarioComentarios comentarios={comentarios}/>
+                                {loadingComentarios ? <Spinner /> : <UsuarioComentarios comentarios={comentarios}/>}
                             </AccordionPanel>
                         </AccordionItem>
                     </Accordion>
@@ -111,9 +106,15 @@ const UsuarioPage = () => {
                         </TabList>
 
                         <TabPanels>
-                            <TabPanel> <UsuarioEntradas entradas={entradas} onComentarioPublicado={getEntradas}/> </TabPanel>
-                            <TabPanel> <UsuarioAmigosComponent amigos={amigos}/> </TabPanel>
-                            <TabPanel> <UsuarioComentarios comentarios={comentarios}/> </TabPanel>
+                            <TabPanel> 
+                                {loadingEntradas ? <Spinner /> : <UsuarioEntradas entradas={entradas} onComentarioPublicado={refetchEntradas}/>}
+                            </TabPanel>
+                            <TabPanel> 
+                                {loadingAmigos ? <Spinner /> : <UsuarioAmigosComponent amigos={amigos}/>}
+                            </TabPanel>
+                            <TabPanel> 
+                                {loadingComentarios ? <Spinner /> : <UsuarioComentarios comentarios={comentarios}/>}
+                            </TabPanel>
                         </TabPanels>
                     </Tabs>
                 </Box>

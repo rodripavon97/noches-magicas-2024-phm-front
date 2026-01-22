@@ -1,11 +1,11 @@
-import { Button, Card, CardBody, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react' 
+import { Button, Card, CardBody, Flex, Heading, Image, Stack, Text, Spinner, IconButton } from '@chakra-ui/react' 
 import { useTranslation } from 'react-i18next'
 import { theme } from '../../styles/styles'
 import { FaPen } from 'react-icons/fa'
 import { FaTrash } from 'react-icons/fa'
 import dateFormat from '../../utils/formatDate'
 import {  useNavigate } from 'react-router-dom'
-import { showService } from '../../service/showService'
+import { useDeleteShow } from '../../hooks'
 import { useMessageToast } from '../../hooks/useToast'
 import { Show } from 'src/domain/Show'
 
@@ -19,6 +19,7 @@ interface CardAdminProps {
 const CardAdmin = ({ show, onShowClick,actualizarData, handlerEdit,isSelected }: CardAdminProps ) => {
     const { t } = useTranslation('commons')
     const navigate = useNavigate()
+    const { deleteShow, deleting } = useDeleteShow()
     const { errorToast, successToast } = useMessageToast()
 
     const navigateToDetalle = () => {
@@ -29,12 +30,13 @@ const CardAdmin = ({ show, onShowClick,actualizarData, handlerEdit,isSelected }:
         onShowClick(show) 
     } 
     const handleClickDelete = async () => {
-        await showService.eliminarShow(show.id).then(() => {
+        try {
+            await deleteShow(show.id)
             successToast('Show eliminado con éxito')
-        }).catch((error) => {
+            actualizarData()
+        } catch (error) {
             errorToast(error)
-        })
-        actualizarData()
+        }
     }
 
    
@@ -79,10 +81,29 @@ const CardAdmin = ({ show, onShowClick,actualizarData, handlerEdit,isSelected }:
                 </CardBody>
                 <Flex direction="column" alignItems="center">
 
-                    <Flex direction="row" alignItems="center" mb={4}>
-                        <FaTrash color={theme.colors.brand.colorFourth} onClick={handleClickDelete} />
-                        <FaPen color={theme.colors.brand.colorFourth} onClick={handlerEdit}/>
-
+                    <Flex direction="row" alignItems="center" gap={2} mb={4}>
+                        {deleting ? (
+                            <Spinner size="sm" color={theme.colors.brand.colorFourth} />
+                        ) : (
+                            <IconButton
+                                aria-label="Eliminar show"
+                                icon={<FaTrash />}
+                                size="sm"
+                                variant="ghost"
+                                color={theme.colors.brand.colorFourth}
+                                onClick={handleClickDelete}
+                                isDisabled={deleting}
+                            />
+                        )}
+                        <IconButton
+                            aria-label="Editar show"
+                            icon={<FaPen />}
+                            size="sm"
+                            variant="ghost"
+                            color={theme.colors.brand.colorFourth}
+                            onClick={handlerEdit}
+                            isDisabled={deleting}
+                        />
                     </Flex>
 
                     <Button size="sm" bg={theme.colors.brand.colorFourth} color={'white'} onClick={navigateToDetalle}>
