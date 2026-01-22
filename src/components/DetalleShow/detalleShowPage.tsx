@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button, Flex, Grid, Heading, Image, Text } from '@chakra-ui/react'
+import { Button, Flex, Grid, Heading, Image, Text, Spinner } from '@chakra-ui/react'
 import CardFecha from '../Card/CardFecha'
 import CardUbicacion from '../Card/CardUbicacion'
 import CardComentario from '../Card/CardComentarios'
@@ -9,10 +9,6 @@ import { FaLocationDot, FaPlus } from 'react-icons/fa6'
 import { FaStar } from 'react-icons/fa'
 import { theme } from '../../styles/styles'
 import Form from '../Form/ModalForm'
-import { ShowDetalle } from '../../domain/detalleShow'
-import { useOnInit } from '../../hooks/useOnInit'
-import { showService } from '../../service/showService'
-import { usuarioService } from '../../service/usuarioService'
 import dateFormat from '../../utils/formatDate'
 import timeFormat from '../../utils/formatHour'
 import PropTypes from 'prop-types'
@@ -20,6 +16,7 @@ import moment from 'moment'
 import 'moment/locale/es'
 import { useMessageToast } from '../../hooks/useToast'
 import { ScoreFormatter } from '../../utils/scoreFormatter'
+import { useShow, useCart, useWaitingList, useAddFunction, UseUser } from '../../hooks'
 
 
 moment.updateLocale('es', {
@@ -32,35 +29,48 @@ export interface DetalleShowProps {
   isAdmin: boolean
 }
 export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
-
   const { t } = useTranslation('detalleShow')
-  const [cantidades, setCantidades] = useState<number[]>([0, 0, 0])
-  const [isOpen, setIsOpen] = useState(false)
   const { id } = useParams()
-  const [input1, setInput1] = useState('')
-  const [input2, setInput2] = useState('')
-  const [showDetalle, setShow] = useState<ShowDetalle | null>(null)
-  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null)
-  const [funcion, setFuncion] = useState<number | null>(null)
+  const navigate = useNavigate()
+  const { userId } = UseUser()
+  
+  // Hooks de servicios
+  const { show: showDetalle, loading, error, refetch } = useShow(id || '')
+  const { addToCart } = useCart(userId || 0)
+  const { addToWaitingList, adding: addingToWaitlist } = useWaitingList()
+  const { addFunction, adding: addingFunction } = useAddFunction()
   const { errorToast, successToast } = useMessageToast()
 
+  // Estado local
+  const [cantidades, setCantidades] = useState<number[]>([0, 0, 0])
+  const [isOpen, setIsOpen] = useState(false)
+  const [input1, setInput1] = useState('')
+  const [input2, setInput2] = useState('')
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null)
+  const [funcion, setFuncion] = useState<number | null>(null)
 
-  const getShowPorID = async () => {
+  // Mostrar errores con toast
+  if (error) {
+    errorToast(error)
+  }
+
+  const handleAgregarAListaEspera = async () => {
+    if (!userId || !showDetalle) return
+    
     try {
-      const ShowByID = await showService.getShowPorID(id)
-      setShow(ShowByID)
+      await addToWaitingList(showDetalle.id, userId)
+      successToast('Se te notificará cuando haya nuevas funciones disponibles')
     } catch (error) {
-      // Error al cargar show
+      errorToast(error)
     }
   }
 
-  const navigateToDashboard = async () => {
-    await showService.sumarAListaEspera(showDetalle.id)
-  }
-
-  const navigate = useNavigate()
-
   const agregarToCarrito = async () => {
+    if (!userId || !showDetalle) {
+      errorToast('Debes iniciar sesión para agregar al carrito')
+      return
+    }
+
     if (funcion === null || funcion === undefined) {
       errorToast('Por favor selecciona una función')
       return
@@ -77,7 +87,12 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
     try {
       for (let i = 0; i < cantidades.length; i++) {
         if (cantidades[i] > 0 && ubicaciones[i]) {
-          await agregarAlCarrito(showDetalle.id, funcion, cantidades[i], ubicaciones[i])
+          await addToCart({
+            idShow: showDetalle.id,
+            idFuncion: funcion,
+            cantidad: cantidades[i],
+            ubicacion: ubicaciones[i] as any,
+          })
         }
       }
       
@@ -88,16 +103,17 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
     }
   }
 
-  const agregarAlCarrito = async (idShow: string, funcion: number, cantidad: number, ubicacion: string) => {
-    // Asegurarse de que ubicacion sea un string válido del enum
-    const ubicacionString = ubicacion.toString()
-    await usuarioService.agregarAlCarrito(idShow, funcion, cantidad, ubicacionString as any)
-  }
-
-
   const handleSubmitForm = async (formData) => {
-    await showService.agregarNuevaFuncion(showDetalle.id, formData)
-    getShowPorID()
+    if (!showDetalle) return
+    
+    try {
+      await addFunction(showDetalle.id, formData)
+      successToast('Función agregada exitosamente')
+      refetch() // Recargar el show
+      setIsOpen(false)
+    } catch (error) {
+      errorToast(error)
+    }
   }
 
   const handleNumberInputChange = (value: number, ubicacionCosto: number) => {
@@ -121,10 +137,20 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
     return ubicacion.replace(/([A-Z])/g, ' $1').trim()
   }
 
-  useOnInit(getShowPorID)
+  if (loading) {
+    return (
+      <Flex justifyContent="center" alignItems="center" h="60vh">
+        <Spinner size='xl' color={theme.colors.brand.colorFourth} />
+      </Flex>
+    )
+  }
 
   if (!showDetalle) {
-    return <div>Cargando...</div>
+    return (
+      <Flex justifyContent="center" alignItems="center" h="60vh">
+        <Text color="white" fontSize="lg">No se encontró el show</Text>
+      </Flex>
+    )
   }
 
   return (
@@ -243,8 +269,12 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
                   ) : (
                     <Button
                       width={'40%'}
-                      size="sm" bg={theme.colors.brand.colorFourth}
-                      onClick={navigateToDashboard}>
+                      size="sm" 
+                      bg={theme.colors.brand.colorFourth}
+                      onClick={handleAgregarAListaEspera}
+                      isLoading={addingToWaitlist}
+                      loadingText="Agregando..."
+                    >
                       Avisarme nueva funcion
                     </Button>
                   )}

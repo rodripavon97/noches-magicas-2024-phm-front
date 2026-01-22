@@ -2,7 +2,7 @@
 import { Box, Button, Flex, Avatar, Input, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Text } from "@chakra-ui/react"
 import { theme } from '../../styles/styles'
 import { useState, useEffect } from "react"
-import { usuarioService } from "../../service/usuarioService"
+import { userService } from "../../service/userService"
 import { Usuario } from "../../domain/Usuario"
 import { useMessageToast } from "@hooks/useToast"
 import UseUser from "@hooks/useUser"
@@ -18,7 +18,11 @@ export const UsuarioSidebar = () => {
     const getDatosUsuario = async () => {
         try {
             setLoading(true)
-            const datosUsuario = await usuarioService.getInfoUsuario()
+            const userId = localStorage.getItem('userId')
+            if (!userId) {
+                throw new Error('No se encontró el ID del usuario')
+            }
+            const datosUsuario = await userService.getUser(Number(userId))
             const usuarioObjeto = Usuario.fromJSON(datosUsuario)
             setUsuario(usuarioObjeto)
         } catch (error) {
@@ -69,10 +73,14 @@ export const UsuarioSidebar = () => {
 
     const enviarCambios = async () => {
         try {
-            await usuarioService.editarDatos(usuario.nombre, usuario.apellido)
+            const userId = Number(localStorage.getItem('userId'))
+            await userService.updateUser(userId, { 
+                nombre: usuario.nombre, 
+                apellido: usuario.apellido 
+            })
             successToast("Datos editados con éxito")
             
-            const datosActualizados = await usuarioService.getInfoUsuario()
+            const datosActualizados = await userService.getUser(userId)
             const usuarioActualizado = Usuario.fromJSON(datosActualizados)
             
             setUsuario(usuarioActualizado)
@@ -100,7 +108,8 @@ export const UsuarioSidebar = () => {
 
     const sumarCredito = async () => {
         try {
-            await usuarioService.sumarCredito(creditos)
+            const userId = Number(localStorage.getItem('userId'))
+            await userService.addCredits(userId, Number(creditos))
             onClose()
             successToast("Saldo cargado correctamente")
             await getDatosUsuario()

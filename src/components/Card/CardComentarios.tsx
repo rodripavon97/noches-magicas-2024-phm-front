@@ -3,7 +3,8 @@ import { theme } from '../../styles/styles'
 import { FaTrash } from "react-icons/fa"
 import { FaStar } from "react-icons/fa"
 import { useState } from "react"
-import { usuarioService } from '../../service/usuarioService'
+import { useUserComments, UseUser } from '../../hooks'
+import { useMessageToast } from '../../hooks/useToast'
 import { Comentario } from "src/domain/Comentario"
 
 export interface CardComentarioProps {
@@ -12,13 +13,21 @@ export interface CardComentarioProps {
 }
 const CardComentario = ({comentario, estaEnPerfil}: CardComentarioProps) => {
     const [existeComentario, setExisteComentario] = useState(true)
+    const [loading, setLoading] = useState(false)
+    const { userId } = UseUser()
+    const { deleteComment } = useUserComments(userId || 0)
+    const { errorToast, successToast } = useMessageToast()
 
     const quitarComentario = async () => {
+        setLoading(true)
         try {
-            await usuarioService.borrarComentario(comentario.idShow)
+            await deleteComment(comentario.idShow)
             setExisteComentario(false)
+            successToast('Comentario eliminado correctamente')
         } catch (error) {
-            console.log(error)
+            errorToast(error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -45,7 +54,15 @@ const CardComentario = ({comentario, estaEnPerfil}: CardComentarioProps) => {
                         <GridItem justifyContent={'flex-end'}>
                             <Icon aria-label="fav" as={FaStar}/> {comentario.puntuacion}
                             {estaEnPerfil ? (
-                                <IconButton aria-label="delete" icon={<FaTrash/> } colorScheme="black" minWidth={"1.5rem"} onClick={quitarComentario}/>
+                                <IconButton 
+                                    aria-label="delete" 
+                                    icon={<FaTrash/>} 
+                                    colorScheme="black" 
+                                    minWidth={"1.5rem"} 
+                                    onClick={quitarComentario}
+                                    isLoading={loading}
+                                    isDisabled={loading}
+                                />
                             ) : (
                                 <></>
                             )}

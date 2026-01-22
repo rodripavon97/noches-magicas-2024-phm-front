@@ -1,4 +1,4 @@
-import { showService } from './showService'
+import { showServiceNew as showService } from './showServiceNew'
 
 /**
  * Servicio para manejar el registro de logs

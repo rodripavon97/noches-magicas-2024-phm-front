@@ -1,14 +1,66 @@
-// Hooks personalizados nuevos
+// ============================================
+// HOOKS UTILITARIOS
+// ============================================
+
 export { useApi } from './useApi'
 export { useToastHandler } from './useToastHandler'
 export { useForm } from './useForm'
 export { useDebounce } from './useDebounce'
 export { useLocalStorage } from './useLocalStorage'
-
-// Hooks existentes migrados
 export { useOnInit } from './useOnInit'
 export { useMessageToast } from './useToast'
-export { default as UseUser } from './useUser'
 
-// Tipos
-export type { UseApiResult, ApiError } from '@types/hooks'
+// ============================================
+// HOOKS DE ESTADO GLOBAL (Zustand)
+// ============================================
+
+export { default as UseUser } from './useUserStore';
+export { useUserStore } from './useUserStore';
+
+// ============================================
+// HOOKS DE AUTENTICACIÓN
+// ============================================
+
+export { 
+  useAuth, 
+  useLogin, 
+  useLogout, 
+  useCurrentUser 
+} from './useAuth'
+
+// ============================================
+// HOOKS DE USUARIOS
+// ============================================
+
+export {
+  useUser,
+  useUserFriends,
+  useUpdateUser,
+  useCart,
+  useUserComments,
+  usePurchasedTickets,
+  useAddCredits,
+} from './useUsers'
+
+// ============================================
+// HOOKS DE SHOWS
+// ============================================
+
+export {
+  useShows,
+  useShow,
+  useSearchShows,
+  useShowsByLocation,
+  useShowsAdmin,
+  useUpdateShow,
+  useDeleteShow,
+  useAddFunction,
+  useWaitingList,
+  useRegisterClick,
+} from './useShows'
+
+// ============================================
+// TIPOS
+// ============================================
+
+export type { UseApiResult, ApiError } from '../types/hooks'

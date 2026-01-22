@@ -182,3 +182,9 @@ export const selectUserName = (state: UserState) =>
   state.user ? `${state.user.nombre} ${state.user.apellido}` : '';
 export const selectUserAvatar = (state: UserState) => state.user?.fotoPerfil || '';
 export const selectUserSaldo = (state: UserState) => state.user?.saldo || 0;
+
+// ============================================
+// DEFAULT EXPORT (para compatibilidad)
+// ============================================
+
+export default useUserStore;

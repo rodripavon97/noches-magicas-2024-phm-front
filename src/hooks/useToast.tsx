@@ -20,14 +20,18 @@ export const useMessageToast = () => {
     const status = error.response ? response.status : 400
     const message = response.data ? response.data.message : error.message
 
+    // En desarrollo, mostrar siempre el mensaje del backend
+    const isDevelopment = import.meta.env.DEV
+    
     const mensajeError =
-      status >= INTERNAL_SERVER_ERROR
+      status >= INTERNAL_SERVER_ERROR && !isDevelopment
         ? 'Ocurrió un error. Consulte al administrador del sistema'
         : status === undefined
         ? 'Ocurrió un error al conectarse al backend. Consulte al administrador del sistema'
         : message
+    
     if (status >= INTERNAL_SERVER_ERROR) {
-      console.error(error)
+      console.error('Error del servidor:', error)
     }
     toast({
       description: mensajeError,

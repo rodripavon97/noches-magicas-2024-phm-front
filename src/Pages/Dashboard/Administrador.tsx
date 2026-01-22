@@ -4,6 +4,7 @@ import {
   Button,
   Divider,
   Flex,
+  Spinner,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import FiltroBusqueda from '../../components/FiltroBusqueda/FiltroBusqueda'
@@ -12,8 +13,7 @@ import { FaPlus } from 'react-icons/fa'
 import { theme } from '../../styles/styles'
 import CardFecha from '../../components/Card/CardFecha'
 import Form from '../../components/Form/ModalForm'
-import { showService } from '../../service/showService'
-import { useOnInit } from '../../hooks/useOnInit'
+import { useShowsAdmin, useAddFunction, useUpdateShow, UseUser } from '../../hooks'
 import timeFormat from '../../utils/formatHour'
 import dateFormat from '../../utils/formatDate'
 import moment from 'moment'
@@ -28,7 +28,7 @@ moment.updateLocale('es', {
 })
 const Administrador = (isAdmin) => {
   const { t } = useTranslation('dashboard')
-  const [shows, setShows] = useState([])
+  const { userId } = UseUser()
   const [artistaABuscar, setArtistaABuscar] = useState('')
   const [locacionABuscar, setLocacionABuscar] = useState('')
   const [showData, setShowData] = useState({})
@@ -42,31 +42,39 @@ const Administrador = (isAdmin) => {
   const [selectedShowId, setSelectedShowId] = useState(null)
   const { errorToast, successToast } = useMessageToast()
 
+  // Hooks de servicios
+  const { shows, loading, error, refetch } = useShowsAdmin({
+    artista: artistaABuscar,
+    location: locacionABuscar,
+    userId: userId || undefined,
+  })
+  const { addFunction, adding } = useAddFunction()
+  const { updateShow, updating } = useUpdateShow()
 
-
-  const getShows = async () => {
-    try {
-      const shows = await showService.getShowsAdmin({
-        artista: artistaABuscar,
-        location: locacionABuscar,
-      })
-
-      setShows(shows)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  // Mostrar errores con toast
   useEffect(() => {
-    getShows()
-  }, [])
+    if (error) {
+      errorToast(error)
+    }
+  }, [error, errorToast])
 
   const handleSubmitForm = async (formData) => {
-    await showService.agregarNuevaFuncion(showData.id, formData)
-    getShows()
-
+    try {
+      await addFunction(showData.id, formData)
+      successToast('Función agregada exitosamente')
+      setIsOpen(false)
+      await refetch()
+    } catch (error) {
+      errorToast(error)
+    }
   }
+
   const handleSearchClick = () => {
-    getShows()
+    refetch({
+      artista: artistaABuscar,
+      location: locacionABuscar,
+      userId: userId || undefined,
+    })
   }
 
   const handleTextChangeLocation = (e) => {
@@ -89,14 +97,15 @@ const Administrador = (isAdmin) => {
     setIsEdit(true)
   }
   const handleSubmitFormShow = async (formData) => {
-    await showService.editarShow(showData.id, formData).then(() => {
+    try {
+      await updateShow(showData.id, formData)
       successToast('Show editado correctamente')
-    }).catch(() => {
+      setIsEdit(false)
+      await refetch()
+    } catch (error) {
       errorToast('Error al editar show')
-    })
-    getShows()
+    }
   }
-  useOnInit(getShows)
 
   const colorVentas = () => {
     if (showData.ventas < 1000000) {
