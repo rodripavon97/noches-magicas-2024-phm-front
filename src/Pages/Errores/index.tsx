@@ -2,7 +2,6 @@
 import { Box, Button, Container, Image, Text } from '@chakra-ui/react'
 import { IoArrowBack } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom'
-import PropTypes from 'prop-types'
 import img404 from '../../assets/errors/error-404.png'
 import img500 from '../../assets/errors/error-500.png'
 import img401 from '../../assets/errors/error-401.png'
@@ -14,7 +13,11 @@ const IMAGE_MAP = {
   500: img500,
 }
 
-function ErrorPage({ status }) {
+interface ErrorPageProps {
+  status: string
+}
+
+function ErrorPage({ status }: ErrorPageProps) {
   const navigate = useNavigate()
   const img = IMAGE_MAP[status]
   const { t } = useTranslation('errors', { keyPrefix: status })
@@ -54,15 +57,6 @@ function ErrorPage({ status }) {
       </Container>
     </Box>
   )
-}
-
-ErrorPage.defaultProps = {
-  reloadDocument: false,
-}
-
-ErrorPage.propTypes = {
-  status: PropTypes.string.isRequired,
-  reloadDocument: PropTypes.bool,
 }
 
 export default ErrorPage

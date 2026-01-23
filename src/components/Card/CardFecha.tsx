@@ -1,6 +1,5 @@
 import { Card, Flex, Heading, Text } from '@chakra-ui/react'
 import { theme } from '../../styles/styles'
-import PropTypes from 'prop-types'
 import { useState } from 'react'
 
 export interface CardFechaProps {

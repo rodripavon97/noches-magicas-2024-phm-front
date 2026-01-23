@@ -1,5 +1,4 @@
 import { Flex, Heading, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Text } from '@chakra-ui/react'
-import PropTypes from 'prop-types'
 import { theme } from '../../styles/styles'
 
 export interface CardUbicacionProps {

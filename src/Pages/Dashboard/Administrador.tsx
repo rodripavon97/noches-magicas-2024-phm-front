@@ -17,7 +17,6 @@ import { useShowsAdmin, useAddFunction, useUpdateShow, UseUser } from '../../hoo
 import timeFormat from '../../utils/formatHour'
 import dateFormat from '../../utils/formatDate'
 import moment from 'moment'
-import PropTypes from 'prop-types'
 import 'moment/locale/es'
 import { useMessageToast } from '../../hooks/useToast'
 
@@ -233,6 +232,3 @@ const Administrador = (isAdmin) => {
 }
 
 export default Administrador
-Administrador.propTypes = {
-  isAdmin: PropTypes.bool,
-}

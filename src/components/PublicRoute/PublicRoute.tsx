@@ -1,5 +1,4 @@
 import { Navigate } from 'react-router-dom'
-import PropTypes from 'prop-types'
 import UseUser from '../../hooks/useUser'
 
 export interface PublicRouteProps {

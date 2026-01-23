@@ -1,5 +1,4 @@
 import { Navigate } from 'react-router-dom'
-import PropTypes from 'prop-types'
 import UseUser from '../../hooks/useUser'
 
 export interface ProtectedRouteProps {
@@ -21,11 +20,6 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
 
   // Si pasa todas las validaciones, renderizar el componente
   return children
-}
-
-ProtectedRoute.propTypes = {
-  children: PropTypes.node.isRequired,
-  requireAdmin: PropTypes.bool,
 }
 
 export default ProtectedRoute

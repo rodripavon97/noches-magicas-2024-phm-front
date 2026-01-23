@@ -1,6 +1,5 @@
 import {Button, Card, HStack} from "@chakra-ui/react"
 import { theme } from "../../styles/styles"
-import PropTypes from "prop-types"
 import { Usuario } from "../../domain/Usuario"
 
 export interface CardCarritoProps {
@@ -28,10 +27,6 @@ const CardCarrito = ({usuario}: CardCarritoProps) => {
             </HStack>
         </Card>
     )
-}
-
-CardCarrito.propTypes = {
-    usuario: PropTypes.instanceOf(Usuario)
 }
 
 export default CardCarrito
