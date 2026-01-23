@@ -57,7 +57,7 @@ export {
   useAddFunction,
   useWaitingList,
   useRegisterClick,
-} from './useShows'
+} from './shows'
 
 // ============================================
 // TIPOS
