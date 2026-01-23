@@ -67,34 +67,6 @@ export interface CardActionsProps {
 }
 
 // ============================================
-// NAVBAR TYPES
-// ============================================
-
-export interface NavbarProps {
-  isLoggedIn: boolean;
-  isAdmin: boolean;
-  userName: string;
-  userAvatar: string;
-  onNavigateHome: () => void;
-  onNavigateCart: () => void;
-  onNavigateProfile: () => void;
-  onNavigateLogin?: () => void;
-  onLogout: () => void;
-}
-
-export interface NavbarMobileProps extends NavbarProps {
-  onNavigateLogin: () => void;
-}
-
-export interface NavbarDesktopProps extends Omit<NavbarProps, 'onNavigateLogin'> {}
-
-export interface NavbarMobileItemProps {
-  icon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}
-
-// ============================================
 // FORM TYPES
 // ============================================
 
