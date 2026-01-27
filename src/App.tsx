@@ -1,20 +1,20 @@
-import { theme } from './styles/styles'
+import { useEffect } from 'react'
 import { ChakraProvider } from '@chakra-ui/react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import Routes from './routes'
 import i18n from './i18n'
-import { useEffect } from 'react'
-
+import { theme } from './styles/styles'
 
 function App() {
   useEffect(() => {
     i18n.init()
   }, [])
+
   return (
     <Router>
-        <ChakraProvider theme={theme}>
-          <Routes />
-        </ChakraProvider>
+      <ChakraProvider theme={theme}>
+        <Routes />
+      </ChakraProvider>
     </Router>
   )
 }

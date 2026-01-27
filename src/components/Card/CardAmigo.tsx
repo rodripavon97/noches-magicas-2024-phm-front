@@ -2,7 +2,7 @@ import { Avatar, Card, CardBody, Grid, GridItem, IconButton } from "@chakra-ui/r
 import { theme } from '../../styles/styles'
 import { FaTrash } from "react-icons/fa"
 import { useState } from "react"
-import { usuarioService } from "../../service/usuarioService";
+import { usuarioService } from "../../services/usuarioService";
 import { Usuario } from "src/domain/Usuario";
 import { UsuarioAmigos } from "src/domain/UserAmigos";
 
@@ -17,7 +17,6 @@ const CardAmigo = ({usuario}: CardAmigoProps) => {
             await usuarioService.quitarAmigo(usuario.id)
             setEsAmigo(false)
         } catch (error) {
-            console.log(error)
         }
     }
 

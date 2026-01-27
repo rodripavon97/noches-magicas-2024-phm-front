@@ -1,28 +1,44 @@
 // @ts-nocheck
-import { Box, Button, Flex, Avatar, Input, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Text } from "@chakra-ui/react"
+import {
+  Box,
+  Button,
+  Flex,
+  Avatar,
+  Input,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Text,
+} from '@chakra-ui/react'
 import { theme } from '../../styles/styles'
-import { useState, useEffect } from "react"
-import { usuarioService } from "../../service/usuarioService"
-import { Usuario } from "../../domain/Usuario"
-import { useMessageToast } from "src/hooks/useToast"
-import UseUser from "src/hooks/useUser"
+import { useState, useEffect } from 'react'
+import { usuarioService, authService } from '../../services'
+import { Usuario } from '../../domain/Usuario'
+import { useToast } from '../../hooks'
+import { getErrorMessage } from '../../errors'
 
 export const UsuarioSidebar = () => {
     const [usuario, setUsuario] = useState(null)
     const [loading, setLoading] = useState(true)
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [creditos, setCreditos] = useState()
-    const { errorToast, successToast } = useMessageToast()
-    const { setUser } = UseUser()
+    const toast = useToast()
 
     const getDatosUsuario = async () => {
         try {
             setLoading(true)
-            const datosUsuario = await usuarioService.getInfoUsuario()
+            const userId = authService.getUserId()
+            if (!userId) throw new Error('No hay usuario autenticado')
+            const datosUsuario = await usuarioService.getInfoUsuario(userId)
             const usuarioObjeto = Usuario.fromJSON(datosUsuario)
             setUsuario(usuarioObjeto)
         } catch (error) {
-            errorToast('Error al cargar datos del usuario')
+            toast.error(getErrorMessage(error))
         } finally {
             setLoading(false)
         }
@@ -69,43 +85,33 @@ export const UsuarioSidebar = () => {
 
     const enviarCambios = async () => {
         try {
-            await usuarioService.editarDatos(usuario.nombre, usuario.apellido)
-            successToast("Datos editados con éxito")
+            const userId = authService.getUserId()
+            if (!userId) throw new Error('No hay usuario autenticado')
+            await usuarioService.editarDatos(userId, {
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+            })
+            toast.success('Datos editados con éxito')
             
-            const datosActualizados = await usuarioService.getInfoUsuario()
+            const datosActualizados = await usuarioService.getInfoUsuario(userId)
             const usuarioActualizado = Usuario.fromJSON(datosActualizados)
             
             setUsuario(usuarioActualizado)
-            
-            const usuarioPlano = Object.assign({}, {
-                id: usuarioActualizado.id,
-                nombre: usuarioActualizado.nombre,
-                apellido: usuarioActualizado.apellido,
-                fechaNacimiento: usuarioActualizado.fechaNacimiento instanceof Date 
-                    ? usuarioActualizado.fechaNacimiento.toISOString() 
-                    : usuarioActualizado.fechaNacimiento,
-                fotoPerfil: usuarioActualizado.fotoPerfil,
-                username: usuarioActualizado.username,
-                esAdm: usuarioActualizado.esAdm,
-                edad: usuarioActualizado.edad,
-                saldo: usuarioActualizado.saldo,
-                dni: usuarioActualizado.dni,
-            })
-            
-            setUser(usuarioPlano)
         } catch (error) {
-            errorToast(error)
+            toast.error(getErrorMessage(error))
         }
     }
 
     const sumarCredito = async () => {
         try {
-            await usuarioService.sumarCredito(creditos)
+            const userId = authService.getUserId()
+            if (!userId) throw new Error('No hay usuario autenticado')
+            await usuarioService.sumarCredito(userId, Number(creditos))
             onClose()
-            successToast("Saldo cargado correctamente")
+            toast.success('Saldo cargado correctamente')
             await getDatosUsuario()
         } catch (error) {
-          errorToast(error)
+            toast.error(getErrorMessage(error))
         }
     }
 

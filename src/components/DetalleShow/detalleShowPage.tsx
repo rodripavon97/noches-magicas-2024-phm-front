@@ -1,3 +1,7 @@
+// ============================================
+// COMPONENTE DETALLE SHOW - UI Pura
+// ============================================
+
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Flex, Grid, Heading, Image, Text } from '@chakra-ui/react'
@@ -11,28 +15,24 @@ import { theme } from '../../styles/styles'
 import Form from '../Form/ModalForm'
 import { ShowDetalle } from '../../domain/detalleShow'
 import { useOnInit } from '../../hooks/useOnInit'
-import { showService } from '../../service/showService'
-import { usuarioService } from '../../service/usuarioService'
+import { showService, usuarioService, authService } from '../../services'
+import { useToast } from '../../hooks'
+import { getErrorMessage } from '../../errors'
 import dateFormat from '../../utils/formatDate'
 import timeFormat from '../../utils/formatHour'
-import PropTypes from 'prop-types'
 import moment from 'moment'
 import 'moment/locale/es'
-import { useMessageToast } from '../../hooks/useToast'
 import { ScoreFormatter } from '../../utils/scoreFormatter'
 
-
 moment.updateLocale('es', {
-  weekdays: [
-    'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado',
-  ],
+  weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
 })
 
 export interface DetalleShowProps {
   isAdmin: boolean
 }
-export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
 
+export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
   const { t } = useTranslation('detalleShow')
   const [cantidades, setCantidades] = useState<number[]>([0, 0, 0])
   const [isOpen, setIsOpen] = useState(false)
@@ -42,62 +42,92 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
   const [showDetalle, setShow] = useState<ShowDetalle | null>(null)
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null)
   const [funcion, setFuncion] = useState<number | null>(null)
-  const { errorToast, successToast } = useMessageToast()
-
+  const toast = useToast()
 
   const getShowPorID = async () => {
     try {
+      if (!id) return
       const ShowByID = await showService.getShowPorID(id)
       setShow(ShowByID)
     } catch (error) {
-      // Error al cargar show
+      toast.error(getErrorMessage(error))
     }
   }
 
   const navigateToDashboard = async () => {
-    await showService.sumarAListaEspera(showDetalle.id)
+    try {
+      if (!showDetalle) return
+      const userId = authService.getUserId()
+      if (!userId) {
+        toast.error('Debes estar autenticado')
+        return
+      }
+      await showService.sumarAListaEspera(showDetalle.id, userId)
+      toast.success('Te avisaremos cuando haya una nueva función')
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    }
   }
 
   const navigate = useNavigate()
 
   const agregarToCarrito = async () => {
     if (funcion === null || funcion === undefined) {
-      errorToast('Por favor selecciona una función')
+      toast.error('Por favor selecciona una función')
       return
     }
+
+    if (!showDetalle) return
 
     const ubicaciones = Array.from(showDetalle.ubicacionCosto.keys())
     const totalEntradas = cantidades.reduce((sum, cant) => sum + cant, 0)
-    
+
     if (totalEntradas === 0) {
-      errorToast('Por favor selecciona al menos una entrada')
+      toast.error('Por favor selecciona al menos una entrada')
       return
     }
-    
+
     try {
+      const userId = authService.getUserId()
+      if (!userId) {
+        toast.error('Debes estar autenticado')
+        return
+      }
+
       for (let i = 0; i < cantidades.length; i++) {
         if (cantidades[i] > 0 && ubicaciones[i]) {
-          await agregarAlCarrito(showDetalle.id, funcion, cantidades[i], ubicaciones[i])
+          await agregarAlCarrito(userId, showDetalle.id, funcion, cantidades[i], ubicaciones[i])
         }
       }
-      
-      successToast('Se ha agregado al carrito')
+
+      toast.success('Se ha agregado al carrito')
       navigate('/carrito')
     } catch (error) {
-      errorToast(error?.response?.data?.message || 'Error al agregar al carrito')
+      toast.error(getErrorMessage(error))
     }
   }
 
-  const agregarAlCarrito = async (idShow: string, funcion: number, cantidad: number, ubicacion: string) => {
-    // Asegurarse de que ubicacion sea un string válido del enum
+  const agregarAlCarrito = async (
+    userId: string,
+    idShow: string,
+    funcion: number,
+    cantidad: number,
+    ubicacion: string
+  ) => {
     const ubicacionString = ubicacion.toString()
-    await usuarioService.agregarAlCarrito(idShow, funcion, cantidad, ubicacionString as any)
+    await usuarioService.agregarAlCarrito(userId, idShow, funcion, cantidad, ubicacionString as any)
   }
 
 
-  const handleSubmitForm = async (formData) => {
-    await showService.agregarNuevaFuncion(showDetalle.id, formData)
-    getShowPorID()
+  const handleSubmitForm = async (formData: any) => {
+    try {
+      if (!showDetalle) return
+      await showService.agregarNuevaFuncion(showDetalle.id, formData)
+      toast.success('Función agregada exitosamente')
+      getShowPorID()
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    }
   }
 
   const handleNumberInputChange = (value: number, ubicacionCosto: number) => {
@@ -112,7 +142,7 @@ export const DetalleShow = ({ isAdmin }: DetalleShowProps) => {
   }
 
 
-  const handleClickFuncion = (index) => {
+  const handleClickFuncion = (index: number) => {
     setSelectedCardIndex(selectedCardIndex === index ? null : index)
     setFuncion(index)
   }

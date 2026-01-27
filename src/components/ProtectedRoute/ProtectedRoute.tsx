@@ -1,13 +1,22 @@
+// ============================================
+// COMPONENTE PROTECTED ROUTE - Ruta Protegida
+// ============================================
+
 import { Navigate } from 'react-router-dom'
-import PropTypes from 'prop-types'
-import UseUser from '../../hooks/useUser.jsx'
+import { useAuth } from '../../hooks'
 
 export interface ProtectedRouteProps {
-  children: React.ReactNode,
+  children: React.ReactNode
   requireAdmin?: boolean
 }
+
+/**
+ * Componente de Ruta Protegida
+ * RESPONSABILIDAD: Proteger rutas que requieren autenticación
+ * Opcionalmente requiere permisos de administrador
+ */
 const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps) => {
-  const { isLoggedIn, isAdmin } = UseUser()
+  const { isLoggedIn, isAdmin } = useAuth()
 
   // Si requiere admin y no es admin, redirigir a 401
   if (requireAdmin && !isAdmin) {
@@ -20,12 +29,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
   }
 
   // Si pasa todas las validaciones, renderizar el componente
-  return children
-}
-
-ProtectedRoute.propTypes = {
-  children: PropTypes.node.isRequired,
-  requireAdmin: PropTypes.bool,
+  return <>{children}</>
 }
 
 export default ProtectedRoute

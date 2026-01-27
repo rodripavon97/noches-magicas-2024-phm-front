@@ -1,16 +1,20 @@
+// ============================================
+// SERVICIO DE LOGGING - Capa de Negocio
+// ============================================
+
 import { showService } from './showService'
 
 /**
- * Servicio para manejar el registro de logs
- * Responsabilidad única: registro de eventos de usuario
+ * Servicio de Logging
+ * RESPONSABILIDAD: Registro de eventos de usuario
  */
-export class LoggingService {
-  static async registrarClickEnShow(showId: string, ubicacion: string): Promise<void> {
+class LoggingService {
+  async registrarClickEnShow(showId: string, ubicacion: string): Promise<void> {
     const usuarioString = localStorage.getItem('user')
     if (!usuarioString) {
       return
     }
-    
+
     const usuario = JSON.parse(usuarioString)
     const logData = {
       fecha: new Date().toISOString(),
@@ -18,7 +22,10 @@ export class LoggingService {
       hora: new Date().toLocaleTimeString(),
       usuario: usuario,
     }
-    
+
     await showService.registrarLogClick(showId, usuario.id, logData)
   }
 }
+
+// Exportar instancia única (singleton)
+export const loggingService = new LoggingService()

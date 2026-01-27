@@ -16,19 +16,19 @@ import {
   Wrap,
 } from '@chakra-ui/react'
 import { Show } from '../../domain/Show'
-import UseUser from '../../hooks/useUser'
+import { useAuth } from '../../hooks'
 import ModalComentario from '../Comentario/ModalComentario'
 import { DateFormatter } from '../../utils/dateFormatter'
 import { ScoreFormatter } from '../../utils/scoreFormatter'
-import { LoggingService } from '../../service/loggingService'
+import { loggingService } from '../../services'
 
 const CardShow = ( { show, mostrarCantidadEntrada, estaEnPerfil, onComentarioPublicado }: CardShowProps ) => {
   const navigate = useNavigate()
-  const { isLoggedIn } = UseUser()
+  const { isLoggedIn } = useAuth()
   
   const navigateToComprar = async () => {
     if (isLoggedIn) {
-      await LoggingService.registrarClickEnShow(show.id, show.ubicacion)
+      await loggingService.registrarClickEnShow(show.id, show.ubicacion)
       navigate(`/detalle-show/${show.id}`)
     } else {
       navigate('/login')

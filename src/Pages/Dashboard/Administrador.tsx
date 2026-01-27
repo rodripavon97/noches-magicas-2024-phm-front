@@ -1,10 +1,9 @@
-// @ts-nocheck
+// ============================================
+// PÁGINA ADMINISTRADOR - Dashboard Admin
+// ============================================
+
 import React, { useState, useEffect } from 'react'
-import {
-  Button,
-  Divider,
-  Flex,
-} from '@chakra-ui/react'
+import { Button, Divider, Flex } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import FiltroBusqueda from '../../components/FiltroBusqueda/FiltroBusqueda'
 import CardAdmin from '../../components/Card/CardAdmin'
@@ -12,21 +11,20 @@ import { FaPlus } from 'react-icons/fa'
 import { theme } from '../../styles/styles'
 import CardFecha from '../../components/Card/CardFecha'
 import Form from '../../components/Form/ModalForm'
-import { showService } from '../../service/showService'
-import { useOnInit } from '../../hooks/useOnInit'
+import { showService } from '../../services'
+import { useOnInit } from '../../hooks'
+import { useToast } from '../../hooks'
+import { getErrorMessage } from '../../errors'
 import timeFormat from '../../utils/formatHour'
 import dateFormat from '../../utils/formatDate'
 import moment from 'moment'
-import PropTypes from 'prop-types'
 import 'moment/locale/es'
-import { useMessageToast } from '../../hooks/useToast'
 
 moment.updateLocale('es', {
-  weekdays: [
-    'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
-  ]
+  weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
 })
-const Administrador = (isAdmin) => {
+
+const Administrador = (isAdmin: any) => {
   const { t } = useTranslation('dashboard')
   const [shows, setShows] = useState([])
   const [artistaABuscar, setArtistaABuscar] = useState('')
@@ -40,9 +38,7 @@ const Administrador = (isAdmin) => {
   const [inputNombreBanda, setInputNombreBanda] = useState('')
   const [inputNombreRecital, setInputNombreRecital] = useState('')
   const [selectedShowId, setSelectedShowId] = useState(null)
-  const { errorToast, successToast } = useMessageToast()
-
-
+  const toast = useToast()
 
   const getShows = async () => {
     try {
@@ -53,7 +49,7 @@ const Administrador = (isAdmin) => {
 
       setShows(shows)
     } catch (error) {
-      console.log(error)
+      toast.error(getErrorMessage(error))
     }
   }
   useEffect(() => {
@@ -77,7 +73,6 @@ const Administrador = (isAdmin) => {
     setArtistaABuscar(e.target.value)
   }
   const handleShowClick = (showData) => {
-    console.log(showData)
     setSelectedShowId(showData.id)
     setShowData(showData)
     setMostrarData(true)
@@ -90,9 +85,9 @@ const Administrador = (isAdmin) => {
   }
   const handleSubmitFormShow = async (formData) => {
     await showService.editarShow(showData.id, formData).then(() => {
-      successToast('Show editado correctamente')
+      toast.success('Show editado correctamente')
     }).catch(() => {
-      errorToast('Error al editar show')
+      toast.error('Error al editar show')
     })
     getShows()
   }
@@ -224,6 +219,3 @@ const Administrador = (isAdmin) => {
 }
 
 export default Administrador
-Administrador.propTypes = {
-  isAdmin: PropTypes.bool,
-}

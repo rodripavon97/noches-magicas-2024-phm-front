@@ -3,7 +3,7 @@ import { theme } from '../../styles/styles'
 import { FaTrash } from "react-icons/fa"
 import { FaStar } from "react-icons/fa"
 import { useState } from "react"
-import { usuarioService } from '../../service/usuarioService'
+import { usuarioService } from '../../services/usuarioService'
 import { Comentario } from "src/domain/Comentario"
 
 export interface CardComentarioProps {
@@ -18,7 +18,6 @@ const CardComentario = ({comentario, estaEnPerfil}: CardComentarioProps) => {
             await usuarioService.borrarComentario(comentario.idShow)
             setExisteComentario(false)
         } catch (error) {
-            console.log(error)
         }
     }
 

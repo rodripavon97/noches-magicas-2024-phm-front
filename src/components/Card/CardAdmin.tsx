@@ -1,41 +1,54 @@
-import { Button, Card, CardBody, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react' 
+// ============================================
+// CARD ADMIN - Componente UI
+// ============================================
+
+import { Button, Card, CardBody, Flex, Heading, Image, Stack, Text } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { theme } from '../../styles/styles'
-import { FaPen } from 'react-icons/fa'
-import { FaTrash } from 'react-icons/fa'
+import { FaPen, FaTrash } from 'react-icons/fa'
 import dateFormat from '../../utils/formatDate'
-import {  useNavigate } from 'react-router-dom'
-import { showService } from '../../service/showService'
-import { useMessageToast } from '../../hooks/useToast'
-import { Show } from 'src/domain/Show'
+import { useNavigate } from 'react-router-dom'
+import { showService } from '../../services'
+import { useToast } from '../../hooks'
+import { getErrorMessage } from '../../errors'
+import { Show } from '../../domain/Show'
 
 interface CardAdminProps {
-    show: Show
-    onShowClick: (show: Show) => void
-    actualizarData: () => void
-    handlerEdit: () => void
-    isSelected: boolean
+  show: Show
+  onShowClick: (show: Show) => void
+  actualizarData: () => void
+  handlerEdit: () => void
+  isSelected: boolean
 }
-const CardAdmin = ({ show, onShowClick,actualizarData, handlerEdit,isSelected }: CardAdminProps ) => {
-    const { t } = useTranslation('commons')
-    const navigate = useNavigate()
-    const { errorToast, successToast } = useMessageToast()
 
-    const navigateToDetalle = () => {
-        navigate(`/detalle-show/admin/${show.id}`)
-    }
+const CardAdmin = ({
+  show,
+  onShowClick,
+  actualizarData,
+  handlerEdit,
+  isSelected,
+}: CardAdminProps) => {
+  const { t } = useTranslation('commons')
+  const navigate = useNavigate()
+  const toast = useToast()
 
-    const handleClickShow = () => {
-        onShowClick(show) 
-    } 
-    const handleClickDelete = async () => {
-        await showService.eliminarShow(show.id).then(() => {
-            successToast('Show eliminado con éxito')
-        }).catch((error) => {
-            errorToast(error)
-        })
-        actualizarData()
+  const navigateToDetalle = () => {
+    navigate(`/detalle-show/admin/${show.id}`)
+  }
+
+  const handleClickShow = () => {
+    onShowClick(show)
+  }
+
+  const handleClickDelete = async () => {
+    try {
+      await showService.eliminarShow(show.id)
+      toast.success('Show eliminado con éxito')
+      actualizarData()
+    } catch (error) {
+      toast.error(getErrorMessage(error))
     }
+  }
 
    
   

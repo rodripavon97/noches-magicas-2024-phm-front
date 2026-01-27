@@ -1,30 +1,48 @@
+// ============================================
+// COMPONENTE NAVBAR - Barra de Navegación
+// ============================================
+
 import { useState, useEffect } from 'react'
-import { Box, HStack, Text, Link, Avatar, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Button, IconButton, useBreakpointValue } from '@chakra-ui/react'
+import {
+  Box,
+  HStack,
+  Text,
+  Link,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
+  Button,
+  IconButton,
+  useBreakpointValue,
+} from '@chakra-ui/react'
 import { theme } from '../../styles/styles'
 import { IoPerson } from 'react-icons/io5'
-import { FaShoppingBasket, FaHome, FaUser } from 'react-icons/fa'
-import { MdDashboard } from 'react-icons/md'
-import UseUser from '../../hooks/useUser.jsx'
+import { FaShoppingBasket, FaHome } from 'react-icons/fa'
+import { useAuth, useUsuario } from '../../hooks'
 import { useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
-  const { isLoggedIn, user, logout, isAdmin } = UseUser()
+  const { isLoggedIn, isAdmin, logout } = useAuth()
+  const { usuario } = useUsuario()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const navigate = useNavigate()
   
-  // Suscripción explícita al store para forzar re-render
+  // Nombre del usuario para mostrar
   const [userDisplayName, setUserDisplayName] = useState('')
-  
+
   useEffect(() => {
-    if (user && user.nombre && user.apellido) {
-      const displayName = `${user.nombre} ${user.apellido}`
+    if (usuario && usuario.nombre && usuario.apellido) {
+      const displayName = `${usuario.nombre} ${usuario.apellido}`
       setUserDisplayName(displayName)
     }
-  }, [user, user?.nombre, user?.apellido, user?._updated])
+  }, [usuario])
 
   useEffect(() => {
     setIsMenuOpen(false)
-  }, [user])
+  }, [usuario])
 
 
   const handleNavigateCarrito = () => {
@@ -123,7 +141,7 @@ const Navbar = () => {
                 _hover={{ bg: 'rgba(255,255,255,0.1)' }}
               >
                 <Avatar
-                  src={user.fotoPerfil}
+                  src={usuario?.fotoPerfil}
                   size="sm"
                   mb={1}
                 />
@@ -193,12 +211,12 @@ const Navbar = () => {
                 bgColor={theme.colors.brand.colorThrird}>
                 <HStack>
                   <Avatar
-                    src={user.fotoPerfil}
+                    src={usuario?.fotoPerfil}
                     size="md"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                   />
                   <Text color={'white'} fontSize='2xl'>
-                    {userDisplayName || `${user.nombre || ''} ${user.apellido || ''}`}
+                    {userDisplayName || `${usuario?.nombre || ''} ${usuario?.apellido || ''}`}
                   </Text>
                 </HStack>
               </MenuButton>

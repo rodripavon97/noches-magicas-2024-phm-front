@@ -2,7 +2,6 @@
 import { Box, Button, Container, Image, Text } from '@chakra-ui/react'
 import { IoArrowBack } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom'
-import PropTypes from 'prop-types'
 import img404 from '../../assets/errors/error-404.png'
 import img500 from '../../assets/errors/error-500.png'
 import img401 from '../../assets/errors/error-401.png'
@@ -60,9 +59,5 @@ ErrorPage.defaultProps = {
   reloadDocument: false,
 }
 
-ErrorPage.propTypes = {
-  status: PropTypes.string.isRequired,
-  reloadDocument: PropTypes.bool,
-}
 
 export default ErrorPage
